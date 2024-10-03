@@ -30,3 +30,4 @@ bin/
 api-key.txt
 .idea
 .gradle
+build
