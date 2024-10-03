@@ -1,5 +1,8 @@
-import static org.junit.jupiter.api.Assertions.*;
+package test.java.Bot;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.Test;
+import main.java.Bot.ApiFilm;
 class ApiFilmTest {
     @Test
     void takeFilms() throws Exception {

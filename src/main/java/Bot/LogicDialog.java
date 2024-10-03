@@ -1,11 +1,12 @@
+package main.java.Bot;
 public class LogicDialog {
-    private static void breaker(String command){
+    private void breaker(String command){
         if (command.equals("стоп")){
             System.exit(0);
         }
     }
-    public static void startDialog(String command) throws Exception {
-        Storage parser = new Storage();
+    public void startDialog(String command) throws Exception {
+        CommandStorage parser = new CommandStorage();
         ConsoleBot consoleBot = new ConsoleBot();
         consoleBot.outConsole("Привет! Я фильм бот.");
         while(true){

@@ -1,7 +1,8 @@
+package main.java.Bot;
 import java.util.Scanner;
 public class ConsoleBot {
+    private Scanner sc = new Scanner(System.in);
     public String takeArg(){
-        Scanner sc = new Scanner(System.in);
         String result = sc.nextLine();
         result = result.toLowerCase();
         return result;

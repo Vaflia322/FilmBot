@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'application'
+mainClassName = 'main.java.Bot.Main'
+repositories {
+    mavenCentral()
+}
+dependencies {
+    implementation 'org.json:json:20240303'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
+}
+wrapper.gradleVersion='8.10.2'

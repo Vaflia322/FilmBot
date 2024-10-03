@@ -1,4 +1,5 @@
-public class Storage {
+package main.java.Bot;
+public class CommandStorage {
     private String parsingCommand = "-help подскажи фильм стоп";
     private String tellFilmArgCommand = "название жанр список год рейтинг случайный";
     private String fullStorage = parsingCommand+tellFilmArgCommand;
