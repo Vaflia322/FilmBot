@@ -1,6 +1,6 @@
-package test.java.Bot;
+package bot;
 import org.junit.jupiter.api.Test;
-import main.java.Bot.CommandStorage;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CommandStorageTest {

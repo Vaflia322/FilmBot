@@ -1,4 +1,4 @@
-package main.java.Bot;
+package bot;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -1,4 +1,4 @@
-package main.java.Bot;
+package bot;
 import java.util.Scanner;
 public class ConsoleBot {
     private Scanner sc = new Scanner(System.in);

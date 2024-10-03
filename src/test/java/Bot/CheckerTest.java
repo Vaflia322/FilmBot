@@ -1,5 +1,4 @@
-package test.java.Bot;
-import main.java.Bot.Checker;
+package bot;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

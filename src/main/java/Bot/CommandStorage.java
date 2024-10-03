@@ -1,4 +1,4 @@
-package main.java.Bot;
+package bot;
 public class CommandStorage {
     private String parsingCommand = "-help подскажи фильм стоп";
     private String tellFilmArgCommand = "название жанр список год рейтинг случайный";

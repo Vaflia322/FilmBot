@@ -1,4 +1,4 @@
-package main.java.Bot;
+package bot;
 import java.io.FileReader;
 import java.net.URLEncoder;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package main.java.Bot;
+package bot;
 public class LogicDialog {
     private void breaker(String command){
         if (command.equals("стоп")){
