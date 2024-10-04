@@ -7,3 +7,4 @@ public class Main {
         logicDialog.startDialog(command);
     }
 }
+ 
