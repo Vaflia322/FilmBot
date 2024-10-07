@@ -1,42 +1,49 @@
 package bot;
 public class LogicDialog {
-    private void breaker(String command){
+    private void exit(String command){
         if (command.equals("стоп")){
             System.exit(0);
         }
     }
     public void startDialog(String command) throws Exception {
-        CommandStorage parser = new CommandStorage();
-        ConsoleBot consoleBot = new ConsoleBot();
-        consoleBot.outConsole("Привет! Я фильм бот.");
+        ApiFilm requestToAPI = new ApiFilm();
+        CommandStorage commandStorage = new CommandStorage();
+        WorkWithConsole workWithConsole = new WorkWithConsole();
+        RequestAuthentication requestAuthentication = new RequestAuthentication();
+        workWithConsole.print("Привет! Я фильм бот.");
         while(true){
-            if (!parser.getFullStorage().contains(command)){
-                consoleBot.outConsole(parser.parsing("-help"));
+            if (!commandStorage.isMyCommandFullStorage(command)){
+                workWithConsole.print(commandStorage.parsing("-help"));
             }
-            if (parser.getParsingCommand().contains(command)){
-                consoleBot.outConsole(parser.parsing(command));
-                breaker(command);
+            if (commandStorage.isMyCommandParsing(command)){
+                workWithConsole.print(commandStorage.parsing(command));
+                exit(command);
             }
-            if (parser.getTellFilmArgCommand().contains(command)){
-                consoleBot.outConsole(parser.tellFilmArg(command));
+            if (commandStorage.isMyCommandTellFilmArg(command)){
+                workWithConsole.print(commandStorage.tellFilmArg(command));
                 String tellFilmCommand;
                 if (!command.contains("случайный")){
-                    tellFilmCommand = consoleBot.takeArg();
+                    tellFilmCommand = workWithConsole.takeArg();
+                    if (tellFilmCommand.contains("список")){
+                        String[] genres = commandStorage.getStringGenres();
+                        String stringGenres = String.join(", ", genres);
+                        workWithConsole.print(stringGenres);
+                        tellFilmCommand = workWithConsole.takeArg();
+                    }
                 }
                 else{
                     tellFilmCommand = "случайный";
                 }
                 if (tellFilmCommand.equals("стоп") || tellFilmCommand.equals("-help")){
-                    consoleBot.outConsole(parser.parsing(tellFilmCommand));
-                    breaker(tellFilmCommand);
+                    workWithConsole.print(commandStorage.parsing(tellFilmCommand));
+                    exit(tellFilmCommand);
                 }
                 else {
-                    ApiFilm requestToAPI = new ApiFilm();
                     String films = requestToAPI.takeFilms(command, tellFilmCommand);
-                    consoleBot.outConsole(films);
+                    workWithConsole.print(films);
                 }
             }
-            command = consoleBot.takeArg();
+            command = workWithConsole.takeArg();
         }
     }
 }

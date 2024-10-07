@@ -1,50 +1,69 @@
 package bot;
-import java.io.FileReader;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+
+
 public class ApiFilm {
+    private final BufferedReader fileReader;
+
+    {
+        try {
+            fileReader = new BufferedReader(new FileReader("api-key.txt"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final String apiKey;
+
+    {
+        try {
+            apiKey = fileReader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String takeFilms(String type, String request) throws Exception {
         String URLRequest;
-        String result = "";
-        Checker checker = new Checker();
+        StringBuilder result = new StringBuilder();
+        RequestAuthentication requestAuthentication = new RequestAuthentication();
         switch (type){
             case ("название"):
-                if (!checker.checkForName(request)){
+                if (!requestAuthentication.isNameExists(request)){
                     return "Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ";
                 }
-                request = URLEncoder.encode(request,"utf-8");
+                request = URLEncoder.encode(request, StandardCharsets.UTF_8);
                 URLRequest = "/search?query="+request;
                 break;
             case ("жанр"):
-                if (!checker.checkForGenre(request)){
-                    return "Вы ввели некорректный жанр, пожалуйста выберите жанр из списка предложенных\n" +
-                            "Чтобы его получить введите СПИСОК";
+                if (!requestAuthentication.isGenreExists(request)){
+                    return "Вы ввели некорректный жанр";
                 }
-                request = URLEncoder.encode(request,"utf-8");
+                request = URLEncoder.encode(request, StandardCharsets.UTF_8);
                 URLRequest = "?genres.name=" + request;
                 break;
             case ("список"):
-                if (!checker.checkForGenre(request)){
-                    return "Вы ввели некорректный жанр, пожалуйста выберите жанр из списка предложенных\n" +
-                            "Чтобы его получить введите СПИСОК";
-                }
-                request = URLEncoder.encode(request,"utf-8");
+                request = URLEncoder.encode(request, StandardCharsets.UTF_8);
                 URLRequest = "?genres.name=" + request;
                 break;
             case("рейтинг"):
-                if (!checker.checkForRating(request)){
+                if (!requestAuthentication.isRatingExists(request)){
                     return "Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\n" +
                             "Также можете указать диапазон,например 7.3-9";
                 }
                 URLRequest = "?rating.kp=" +request;
                 break;
             case("год"):
-                if (!checker.checkForYear(request)){
+                if (!requestAuthentication.isYearExists(request)){
                     return "Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023";
                 }
                 URLRequest = "?year=" +request;
@@ -53,43 +72,75 @@ public class ApiFilm {
                 URLRequest = "/random?";
                 break;
             default:
-                URLRequest = "/random?";
+                return "Некорректный запрос";
         }
-        BufferedReader fileReader = new BufferedReader(new FileReader("api-key.txt"));
-        String apiKey = fileReader.readLine();
-        URL url = new URL("https://api.kinopoisk.dev/v1.4/movie" +URLRequest + "&notNullFields=name"+"&notNullFields=description" +"&notNullFields=rating.kp");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
+        final URL url;
+        try{
+            url = new URL("https://api.kinopoisk.dev/v1.4/movie" +URLRequest + "&notNullFields=name"+"&notNullFields=description" +"&notNullFields=rating.kp");
+        }
+        catch (MalformedURLException e){
+            return "Ошибка при создании URL";
+        }
+        HttpURLConnection con;
+        try{
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+        }
+        catch (Exception e){
+            return "Ошибка при установке соединения";
+        }
         con.setRequestProperty("X-API-Key",apiKey );
-        int responseCode = con.getResponseCode();
+        int responseCode;
+        try{
+            responseCode = con.getResponseCode();
+        }
+        catch (Exception e){
+            return "Ошибка при получении запроса со стороны API";
+        }
         if (responseCode!=200){
             return "Сервис временно не доступен";
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        BufferedReader reader;
+        try{
+            reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        }
+        catch (Exception e){
+            return "Ошибка при прочтении запроса к API";
+        }
+        JSONObject response;
+        try{
+            response = new JSONObject(reader.readLine());
+        }
+        catch(Exception e){
+            return "Ошибка при прочтении запроса к API";
+        }
         if (!request.equals("случайный")) {
-            JSONObject response = new JSONObject(reader.readLine());
             JSONArray films = new JSONArray(response.getJSONArray("docs"));
             if (films.isEmpty()){
                 return "С данными характеристиками не нашлось фильма";
             }
             for (int i = 0; i < 3; i++) {
                 JSONObject outFilm = films.getJSONObject(i);
-                result += "Название: " + outFilm.get("name") + "\n";
-                result += "Описание: " + outFilm.get("description") + "\n";
+                result.append("Название: ").append(outFilm.get("name")).append("\n");
+                result.append("Описание: ").append(outFilm.get("description")).append("\n");
                 JSONObject rating = (outFilm.getJSONObject("rating"));
-                result += "Рейтинг кинопоиска: " + rating.get("kp").toString() + "\n";
-                result += "\n";
+                result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString()).append("\n");
+                result.append("\n");
             }
         }
         else {
-            JSONObject response = new JSONObject(reader.readLine());
             JSONObject rating = (response.getJSONObject("rating"));
-            result += "Название: " + response.get("name") + "\n";
-            result += "Описание: " + response.get("description") + "\n";
-            result += "Рейтинг кинопоиска: " + rating.get("kp").toString() + "\n";
+            result.append("Название: ").append(response.get("name")).append("\n");
+            result.append("Описание: ").append(response.get("description")).append("\n");
+            result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString()).append("\n");
         }
-        reader.close();
-        return result;
+        try{
+            reader.close();
+        }
+        catch(Exception e){
+            return "Ошибка при закрытии потока чтения";
+        }
+        return result.toString();
     }
 }
 
