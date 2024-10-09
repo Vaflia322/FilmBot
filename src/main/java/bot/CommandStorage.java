@@ -1,57 +1,56 @@
 package bot;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.io.BufferedReader;
 public class CommandStorage {
-    private String[] genres = {
-            "аниме",
-            "биография",
-            "боевик",
-            "вестерн",
-            "военный",
-            "детектив",
-            "детский",
-            "для взрослых",
-            "документальный",
-            "драма",
-            "игра",
-            "история",
-            "комедия",
-            "концерт",
-            "короткометражка",
-            "криминал",
-            "мелодрама",
-            "музыка",
-            "мультфильм",
-            "мюзикл",
-            "новости",
-            "приключения",
-            "реальное ТВ",
-            "семейный",
-            "спорт",
-            "ток-шоу",
-            "триллер",
-            "ужасы",
-            "фантастика",
-            "фильм-нуар",
-            "фэнтези",
-            "церемония"
-    };
+    private final HashSet<String> genres = new HashSet<String>();
 
-    public String[] getStringGenres() {
+    {
+        BufferedReader genresReader;
+        try {
+            genresReader = new BufferedReader(new FileReader("genres.txt"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            String line = genresReader.readLine();
+            while (line != null) {
+                genres.add(line);
+                line = genresReader.readLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public HashSet<String> getGenres() {
         return genres;
     }
-    private final String parsingCommand = "-help подскажи фильм стоп";
-    private final String tellFilmArgCommand = "название жанр год рейтинг случайный";
-    private final String fullCommand =parsingCommand + tellFilmArgCommand;
+    private final String[] parsingCommand = {"-help", "подскажи фильм", "стоп"};
+    private final String[] tellFilmArgCommand = {"название", "жанр", "год", "рейтинг", "случайный"};
 
     public boolean isMyCommandFullStorage(String command){
-        return (fullCommand).contains(command);
+        return isMyCommandParsing(command) || isMyCommandTellFilmArg(command);
     }
     public boolean isMyCommandParsing(String command) {
-        return parsingCommand.contains(command);
+        for (int i = 0;i<3;i++){
+            if (parsingCommand[i].equals(command)){
+                return true;
+            }
+        }
+        return false;
     }
     public boolean isMyCommandTellFilmArg(String command){
-        return tellFilmArgCommand.contains(command);
+        for (int i = 0;i<5;i++){
+            if (tellFilmArgCommand[i].equals(command)){
+                return true;
+            }
+        }
+        return false;
     }
-    public String parsing(String command) throws Exception {
+    public String parsing(String command){
         switch (command) {
             case ("-help"):
                 return "Для получения справки введите -help, если вам нужно подсказать фильм введите подскажи фильм\n" +
@@ -66,7 +65,7 @@ public class CommandStorage {
                         "Чтобы прекратить работу бота введите стоп";
         }
     }
-    public String tellFilmArg(String command) throws Exception {
+    public String parsingFilms(String command) {
         switch (command) {
             case ("название"):
                 return "Введите название фильма на русском языке";

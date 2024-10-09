@@ -1,14 +1,28 @@
 package bot;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RequestAuthentication {
     CommandStorage commandStorage = new CommandStorage();
-    String [] genres = commandStorage.getStringGenres();
-
-    public boolean isGenreExists(String genre) {
-        for (int i = 0; i < genres.length; i++) {
-            if (genres[i].equals(genre)) {
+    HashSet<String> genres = commandStorage.getGenres();
+    Pattern patternName = Pattern.compile(
+            "[" +                   //начало списка допустимых символов
+                    "а-яА-ЯёЁ" +    //буквы русского алфавита
+                    "\\d" +         //цифры
+                    "\\s" +         //знаки-разделители (пробел, табуляция и т.д.)
+                    "\\p{Punct}" +  //знаки пунктуации
+                    "]" +                   //конец списка допустимых символов
+                    "*");                   //допускается наличие указанных символов в любом количестве
+    Pattern patternNumber = Pattern.compile(
+            "[" +                   //начало списка допустимых символов
+                    "\\d" +         //цифры
+                    "\\p{Punct}" +  //знаки пунктуации
+                    "]" +                   //конец списка допустимых символов
+                    "*");                   //допускается наличие указанных символов в любом количестве
+    public boolean isGenreExists(String genreAuth) {
+        for(String genre : genres){
+            if (genre.equals(genreAuth)) {
                 return true;
             }
         }
@@ -16,27 +30,11 @@ public class RequestAuthentication {
     }
 
     public boolean isNameExists(String name) {
-        Pattern pattern = Pattern.compile(
-                "[" +                   //начало списка допустимых символов
-                        "а-яА-ЯёЁ" +    //буквы русского алфавита
-                        "\\d" +         //цифры
-                        "\\s" +         //знаки-разделители (пробел, табуляция и т.д.)
-                        "\\p{Punct}" +  //знаки пунктуации
-                        "]" +                   //конец списка допустимых символов
-                        "*");                   //допускается наличие указанных символов в любом количестве
-
-        Matcher matcher = pattern.matcher(name);
+        Matcher matcher = patternName.matcher(name);
         return matcher.matches();
     }
     public boolean isRatingExists(String number){
-        Pattern pattern = Pattern.compile(
-                "[" +                   //начало списка допустимых символов
-                        "\\d" +         //цифры
-                        "\\p{Punct}" +  //знаки пунктуации
-                        "]" +                   //конец списка допустимых символов
-                        "*");                   //допускается наличие указанных символов в любом количестве
-
-        Matcher matcher = pattern.matcher(number);
+        Matcher matcher = patternNumber.matcher(number);
         String checkNumber = "";
         double doubleNumber;
         if (matcher.matches()) {
@@ -61,14 +59,7 @@ public class RequestAuthentication {
         return matcher.matches();
     }
     public boolean isYearExists(String number) {
-        Pattern pattern = Pattern.compile(
-                "[" +                   //начало списка допустимых символов
-                        "\\d" +         //цифры
-                        "\\p{Punct}" +  //знаки пунктуации
-                        "]" +                   //конец списка допустимых символов
-                        "*");                   //допускается наличие указанных символов в любом количестве
-
-        Matcher matcher = pattern.matcher(number);
+        Matcher matcher = patternNumber.matcher(number);
         String checkNumber = "";
         int intNumber;
         if (matcher.matches()) {
