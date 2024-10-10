@@ -29,17 +29,17 @@ public class CommandStorage {
     public Set<String> getGenres() {
         return genres;
     }
-    private final Set<String> parsingCommand = new HashSet<>(Set.of("-help", "подскажи фильм", "стоп"));
-    private final Set<String> parsingFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг", "случайный"));
+    private final Set<String> supportedCommand = new HashSet<>(Set.of("-help", "подскажи фильм", "стоп"));
+    private final Set<String> supportedFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг", "случайный"));
 
-    public boolean isMyStorage(String command){
-        return isMyParsing(command) || isMyParsingFilms(command);
+    public boolean isCommand(String command){
+        return isSupportedCommand(command) || isSupportedFilmsCommand(command);
     }
-    public boolean isMyParsing(String command) {
-        return parsingCommand.contains(command);
+    public boolean isSupportedCommand(String command) {
+        return supportedCommand.contains(command);
     }
-    public boolean isMyParsingFilms(String command){
-        return parsingFilmsCommand.contains(command);
+    public boolean isSupportedFilmsCommand(String command){
+        return supportedFilmsCommand.contains(command);
     }
     public String parsing(String command){
         switch (command) {

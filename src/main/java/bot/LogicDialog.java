@@ -14,16 +14,16 @@ public class LogicDialog {
         WorkWithConsole workWithConsole = new WorkWithConsole();
         workWithConsole.print("Привет! Я фильм бот.");
         while(true){
-            if (!commandStorage.isMyStorage(command)){
+            if (!commandStorage.isCommand(command)){
                 workWithConsole.print(commandStorage.parsing("-help"));
                 command = workWithConsole.takeArg();
                 continue;
             }
-            if (commandStorage.isMyParsing(command)){
+            if (commandStorage.isSupportedCommand(command)){
                 workWithConsole.print(commandStorage.parsing(command));
                 exit(command);
             }
-            if (commandStorage.isMyParsingFilms(command)){
+            if (commandStorage.isSupportedFilmsCommand(command)){
                 workWithConsole.print(commandStorage.parsingFilms(command));
                 String tellFilmCommand;
                 if (!command.contains("случайный")){
