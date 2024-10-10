@@ -7,7 +7,7 @@ public class WorkWithConsole {
         result = result.toLowerCase();
         return result;
     }
-    public void print(String command) throws Exception {
+    public void print(String command) {
         System.out.println(command);
     }
 }

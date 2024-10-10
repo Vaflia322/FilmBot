@@ -2,10 +2,11 @@ package bot;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Set;
 import java.io.BufferedReader;
+import java.util.HashSet;
 public class CommandStorage {
-    private final HashSet<String> genres = new HashSet<String>();
+    private final Set<String> genres = new HashSet<String>();
 
     {
         BufferedReader genresReader;
@@ -25,30 +26,20 @@ public class CommandStorage {
         }
     }
 
-    public HashSet<String> getGenres() {
+    public Set<String> getGenres() {
         return genres;
     }
-    private final String[] parsingCommand = {"-help", "подскажи фильм", "стоп"};
-    private final String[] tellFilmArgCommand = {"название", "жанр", "год", "рейтинг", "случайный"};
+    private final Set<String> parsingCommand = new HashSet<>(Set.of("-help", "подскажи фильм", "стоп"));
+    private final Set<String> parsingFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг", "случайный"));
 
-    public boolean isMyCommandFullStorage(String command){
-        return isMyCommandParsing(command) || isMyCommandTellFilmArg(command);
+    public boolean isMyStorage(String command){
+        return isMyParsing(command) || isMyParsingFilms(command);
     }
-    public boolean isMyCommandParsing(String command) {
-        for (int i = 0;i<3;i++){
-            if (parsingCommand[i].equals(command)){
-                return true;
-            }
-        }
-        return false;
+    public boolean isMyParsing(String command) {
+        return parsingCommand.contains(command);
     }
-    public boolean isMyCommandTellFilmArg(String command){
-        for (int i = 0;i<5;i++){
-            if (tellFilmArgCommand[i].equals(command)){
-                return true;
-            }
-        }
-        return false;
+    public boolean isMyParsingFilms(String command){
+        return parsingFilmsCommand.contains(command);
     }
     public String parsing(String command){
         switch (command) {

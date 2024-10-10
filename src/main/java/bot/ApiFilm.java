@@ -32,20 +32,20 @@ public class ApiFilm {
         }
     }
 
-    public String takeFilms(String type, String request) throws Exception {
+    public String takeFilms(String type, String request){
         String URLRequest;
         StringBuilder result = new StringBuilder();
-        RequestAuthentication requestAuthentication = new RequestAuthentication();
+        RequestValidation requestValidation = new RequestValidation();
         switch (type){
             case ("название"):
-                if (!requestAuthentication.isNameExists(request)){
+                if (!requestValidation.isNameExists(request)){
                     return "Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ";
                 }
                 request = URLEncoder.encode(request, StandardCharsets.UTF_8);
                 URLRequest = "/search?query="+request;
                 break;
             case ("жанр"):
-                if (!requestAuthentication.isGenreExists(request)){
+                if (!requestValidation.isGenreExists(request)){
                     return "Вы ввели некорректный жанр";
                 }
                 request = URLEncoder.encode(request, StandardCharsets.UTF_8);
@@ -56,14 +56,14 @@ public class ApiFilm {
                 URLRequest = "?genres.name=" + request;
                 break;
             case("рейтинг"):
-                if (!requestAuthentication.isRatingExists(request)){
+                if (!requestValidation.isRatingExists(request)){
                     return "Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\n" +
                             "Также можете указать диапазон,например 7.3-9";
                 }
                 URLRequest = "?rating.kp=" +request;
                 break;
             case("год"):
-                if (!requestAuthentication.isYearExists(request)){
+                if (!requestValidation.isYearExists(request)){
                     return "Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023";
                 }
                 URLRequest = "?year=" +request;

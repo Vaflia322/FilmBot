@@ -1,11 +1,11 @@
 package bot;
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Set;
 
-public class RequestAuthentication {
+public class RequestValidation {
     CommandStorage commandStorage = new CommandStorage();
-    HashSet<String> genres = commandStorage.getGenres();
+    Set<String> genres = commandStorage.getGenres();
     Pattern patternName = Pattern.compile(
             "[" +                   //начало списка допустимых символов
                     "а-яА-ЯёЁ" +    //буквы русского алфавита
@@ -21,12 +21,7 @@ public class RequestAuthentication {
                     "]" +                   //конец списка допустимых символов
                     "*");                   //допускается наличие указанных символов в любом количестве
     public boolean isGenreExists(String genreAuth) {
-        for(String genre : genres){
-            if (genre.equals(genreAuth)) {
-                return true;
-            }
-        }
-        return false;
+        return (genres.contains(genreAuth));
     }
 
     public boolean isNameExists(String name) {

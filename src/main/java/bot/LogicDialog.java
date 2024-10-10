@@ -1,6 +1,6 @@
 package bot;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class LogicDialog {
     private void exit(String command){
@@ -8,28 +8,28 @@ public class LogicDialog {
             System.exit(0);
         }
     }
-    public void startDialog(String command) throws Exception {
+    public void startDialog(String command) {
         ApiFilm requestToAPI = new ApiFilm();
         CommandStorage commandStorage = new CommandStorage();
         WorkWithConsole workWithConsole = new WorkWithConsole();
         workWithConsole.print("Привет! Я фильм бот.");
         while(true){
-            if (!commandStorage.isMyCommandFullStorage(command)){
+            if (!commandStorage.isMyStorage(command)){
                 workWithConsole.print(commandStorage.parsing("-help"));
                 command = workWithConsole.takeArg();
                 continue;
             }
-            if (commandStorage.isMyCommandParsing(command)){
+            if (commandStorage.isMyParsing(command)){
                 workWithConsole.print(commandStorage.parsing(command));
                 exit(command);
             }
-            if (commandStorage.isMyCommandTellFilmArg(command)){
+            if (commandStorage.isMyParsingFilms(command)){
                 workWithConsole.print(commandStorage.parsingFilms(command));
                 String tellFilmCommand;
                 if (!command.contains("случайный")){
                     tellFilmCommand = workWithConsole.takeArg();
                     if (tellFilmCommand.contains("список")){
-                        HashSet<String> genres = commandStorage.getGenres();
+                        Set<String> genres = commandStorage.getGenres();
                         String stringGenres = String.join(", ", genres);
                         workWithConsole.print(stringGenres);
                         tellFilmCommand = workWithConsole.takeArg();
