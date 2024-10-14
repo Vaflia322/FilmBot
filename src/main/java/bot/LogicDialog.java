@@ -1,19 +1,26 @@
 package bot;
 
+
 import java.util.Set;
 
 public class LogicDialog {
-    private void exit(String command){
+    private final ApiFilm apiFilm;
+    public LogicDialog(ApiFilm apiFilm){
+        this.apiFilm = apiFilm;
+
+    }
+    private boolean exit(String command,boolean flag){
         if (command.equals("стоп")){
-            System.exit(0);
+            flag = false;
         }
+        return flag;
     }
     public void startDialog(String command) {
-        ApiFilm requestToAPI = new ApiFilm();
         CommandStorage commandStorage = new CommandStorage();
         WorkWithConsole workWithConsole = new WorkWithConsole();
         workWithConsole.print("Привет! Я фильм бот.");
-        while(true){
+        boolean flag = true;
+        while(flag){
             if (!commandStorage.isCommand(command)){
                 workWithConsole.print(commandStorage.parsing("-help"));
                 command = workWithConsole.takeArg();
@@ -21,7 +28,7 @@ public class LogicDialog {
             }
             if (commandStorage.isSupportedCommand(command)){
                 workWithConsole.print(commandStorage.parsing(command));
-                exit(command);
+                flag = exit(command,flag);
             }
             if (commandStorage.isSupportedFilmsCommand(command)){
                 workWithConsole.print(commandStorage.parsingFilms(command));
@@ -40,12 +47,15 @@ public class LogicDialog {
                 }
                 if (tellFilmCommand.equals("стоп") || tellFilmCommand.equals("-help")){
                     workWithConsole.print(commandStorage.parsing(tellFilmCommand));
-                    exit(tellFilmCommand);
+                    flag = exit(tellFilmCommand,flag);
                 }
                 else {
-                    String films = requestToAPI.takeFilms(command, tellFilmCommand);
-                    workWithConsole.print(films);
+                    Object films = apiFilm.takeFilms(command, tellFilmCommand);
+                    workWithConsole.print(films.toString());
                 }
+            }
+            if (!flag){
+                continue;
             }
             command = workWithConsole.takeArg();
         }

@@ -32,51 +32,47 @@ public class ApiFilm {
         }
     }
 
-    public String takeFilms(String type, String request){
-        String URLRequest;
+    public Object takeFilms(String type, String request){
+        StringBuilder urlRequest = new StringBuilder().append("https://api.kinopoisk.dev/v1.4/movie");
         StringBuilder result = new StringBuilder();
         RequestValidation requestValidation = new RequestValidation();
         switch (type){
             case ("название"):
                 if (!requestValidation.isNameExists(request)){
-                    return "Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ";
+                    return result.append("Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ");
                 }
-                request = URLEncoder.encode(request, StandardCharsets.UTF_8);
-                URLRequest = "/search?query="+request;
+                urlRequest.append("/search?query=");
                 break;
             case ("жанр"):
                 if (!requestValidation.isGenreExists(request)){
-                    return "Вы ввели некорректный жанр";
+                    return result.append("Вы ввели некорректный жанр");
                 }
-                request = URLEncoder.encode(request, StandardCharsets.UTF_8);
-                URLRequest = "?genres.name=" + request;
-                break;
-            case ("список"):
-                request = URLEncoder.encode(request, StandardCharsets.UTF_8);
-                URLRequest = "?genres.name=" + request;
+                urlRequest.append("?genres.name=");
                 break;
             case("рейтинг"):
                 if (!requestValidation.isRatingExists(request)){
-                    return "Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\n" +
-                            "Также можете указать диапазон,например 7.3-9";
+                    return result.append("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\n").append("Также можете указать диапазон,например 7.3-9");
                 }
-                URLRequest = "?rating.kp=" +request;
+                urlRequest.append("?rating.kp=");
                 break;
             case("год"):
                 if (!requestValidation.isYearExists(request)){
-                    return "Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023";
+                    return result.append("Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023");
                 }
-                URLRequest = "?year=" +request;
+                urlRequest.append("?year=");
                 break;
             case("случайный"):
-                URLRequest = "/random?";
+                request = "";
+                urlRequest.append("/random?");
                 break;
             default:
-                return "Некорректный запрос";
+                return result.append("Некорректный запрос");
         }
+        request = URLEncoder.encode(request, StandardCharsets.UTF_8);
+        urlRequest.append(request).append("&notNullFields=name&notNullFields=description&notNullFields=rating.kp");
         final URL url;
         try{
-            url = new URL("https://api.kinopoisk.dev/v1.4/movie" +URLRequest + "&notNullFields=name"+"&notNullFields=description" +"&notNullFields=rating.kp");
+            url = new URL(urlRequest.toString());
         }
         catch (MalformedURLException e){
             return "Ошибка при создании URL";
@@ -114,25 +110,22 @@ public class ApiFilm {
         catch(Exception e){
             return "Ошибка при прочтении запроса к API";
         }
-        if (!request.equals("случайный")) {
+        if (!type.equals("случайный")) {
             JSONArray films = new JSONArray(response.getJSONArray("docs"));
             if (films.isEmpty()){
-                return "С данными характеристиками не нашлось фильма";
+                return result.append("С данными характеристиками не нашлось фильма");
             }
-            for (int i = 0; i < 3; i++) {
-                JSONObject outFilm = films.getJSONObject(i);
-                result.append("Название: ").append(outFilm.get("name")).append("\n");
-                result.append("Описание: ").append(outFilm.get("description")).append("\n");
-                JSONObject rating = (outFilm.getJSONObject("rating"));
-                result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString()).append("\n");
-                result.append("\n");
-            }
+            JSONObject outFilm = films.getJSONObject(0);
+            result.append("Название: ").append(outFilm.get("name")).append("\n");
+            result.append("Описание: ").append(outFilm.get("description")).append("\n");
+            JSONObject rating = (outFilm.getJSONObject("rating"));
+            result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString());
         }
         else {
             JSONObject rating = (response.getJSONObject("rating"));
             result.append("Название: ").append(response.get("name")).append("\n");
             result.append("Описание: ").append(response.get("description")).append("\n");
-            result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString()).append("\n");
+            result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString());
         }
         try{
             reader.close();
@@ -140,7 +133,7 @@ public class ApiFilm {
         catch(Exception e){
             return "Ошибка при закрытии потока чтения";
         }
-        return result.toString();
+        return result;
     }
 }
 

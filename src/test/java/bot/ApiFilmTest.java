@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 
 class ApiFilmTest {
     @Test
-    void takeFilms1() throws Exception {
+    void takeFilms1() {
         ApiFilm apiFilm = new ApiFilm();
-        String result = apiFilm.takeFilms("жанр","123");
-        assertEquals(result,"Вы ввели некорректный жанр");
+        Object result = apiFilm.takeFilms("жанр","123");
+        assertEquals(result.toString(),"Вы ввели некорректный жанр");
     }
     @Test
-    void takeFilms2() throws Exception {
+    void takeFilms2() {
         ApiFilm apiFilm = new ApiFilm();
-        String result = apiFilm.takeFilms("жанр","123");
-        assertEquals(result,"Вот ваш фильм");
+        Object result = apiFilm.takeFilms("жанр","123");
+        assertEquals(result.toString(),"Вот ваш фильм");
     }
 }
