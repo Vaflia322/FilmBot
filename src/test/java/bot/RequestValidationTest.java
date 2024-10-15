@@ -1,63 +1,62 @@
 package bot;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RequestValidationTest {
 
     @Test
-    void isGenreExists1() {
+    void genreValidation() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isGenreExists("драма");
         assertTrue(result);
     }
 
     @Test
-    void isNameExists1() {
+    void nameValidation() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isNameExists("Гадкий я");
         assertTrue(result);
     }
 
     @Test
-    void isRatingExists1() {
+    void ratingValidation() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isRatingExists("8");
         assertTrue(result);
     }
 
     @Test
-    void isYearExists1() {
+    void yearValidation() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isYearExists("2020-2021");
         assertTrue(result);
     }
     @Test
-    void isGenreExists2() {
+    void genreValidationFailed() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isGenreExists("любой");
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    void isNameExists2() {
+    void nameValidationFailed() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isNameExists("Shrek");
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    void isRatingExists2() {
+    void ratingValidationFailed() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isRatingExists("52");
-        assertTrue(result);
+        assertFalse(result);
     }
 
     @Test
-    void isYearExists2() {
+    void yearValidationFailed() {
         RequestValidation requestValidation = new RequestValidation();
         boolean result = requestValidation.isYearExists("2020-202123");
-        assertTrue(result);
+        assertFalse(result);
     }
 }

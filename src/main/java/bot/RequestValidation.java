@@ -7,19 +7,19 @@ public class RequestValidation {
     CommandStorage commandStorage = new CommandStorage();
     Set<String> genres = commandStorage.getGenres();
     Pattern patternName = Pattern.compile(
-            "[" +                   //начало списка допустимых символов
-                    "а-яА-ЯёЁ" +    //буквы русского алфавита
-                    "\\d" +         //цифры
-                    "\\s" +         //знаки-разделители (пробел, табуляция и т.д.)
-                    "\\p{Punct}" +  //знаки пунктуации
-                    "]" +                   //конец списка допустимых символов
-                    "*");                   //допускается наличие указанных символов в любом количестве
+            "[" +
+                    "а-яА-ЯёЁ" +
+                    "\\d" +
+                    "\\s" +
+                    "\\p{Punct}" +
+                    "]" +
+                    "*");
     Pattern patternNumber = Pattern.compile(
-            "[" +                   //начало списка допустимых символов
-                    "\\d" +         //цифры
-                    "\\p{Punct}" +  //знаки пунктуации
-                    "]" +                   //конец списка допустимых символов
-                    "*");                   //допускается наличие указанных символов в любом количестве
+            "[" +
+                    "\\d" +
+                    "\\p{Punct}" +
+                    "]" +
+                    "*");
     public boolean isGenreExists(String genreAuth) {
         return (genres.contains(genreAuth));
     }

@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.util.Set;
 import java.io.BufferedReader;
 import java.util.HashSet;
+
 public class CommandStorage {
-    private final Set<String> genres = new HashSet<String>();
+    private final Set<String> genres = new HashSet<>();
 
     {
         BufferedReader genresReader;
@@ -41,7 +42,7 @@ public class CommandStorage {
     public boolean isSupportedFilmsCommand(String command){
         return supportedFilmsCommand.contains(command);
     }
-    public String parsing(String command){
+    public String parsingSupportedCommand(String command){
         switch (command) {
             case ("-help"):
                 return "Для получения справки введите -help, если вам нужно подсказать фильм введите подскажи фильм\n" +
@@ -56,7 +57,7 @@ public class CommandStorage {
                         "Чтобы прекратить работу бота введите стоп";
         }
     }
-    public String parsingFilms(String command) {
+    public String parsingSupportedFilmsCommand(String command) {
         switch (command) {
             case ("название"):
                 return "Введите название фильма на русском языке";
