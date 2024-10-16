@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'application'
+compileJava.options.encoding = 'UTF-8'
+javadoc.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+}
+test {
+    useJUnitPlatform()
+}
+dependencies {
+    implementation 'org.json:json:20240303'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    //implementation 'org.telegram:telegrambots:6.9.7.1'
+
+}
+wrapper.gradleVersion='8.10.2'
