@@ -7,7 +7,6 @@ public class Main {
         ConsoleInterface workWithConsole = new WorkWithConsole();
         LogicDialog logicDialog = new LogicDialog(apiFilm,workWithConsole);
         logicDialog.startDialog(command);
-        System.exit(0);
     }
 }
  

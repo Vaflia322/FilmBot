@@ -2,6 +2,8 @@ package bot;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
+
+import java.util.Map;
 import java.util.Set;
 
 public class LogicDialog {
@@ -13,10 +15,7 @@ public class LogicDialog {
 
     }
     private boolean exit(String command){
-        if (command.equals("стоп")){
-            return false;
-        }
-        return true;
+        return !command.equals("стоп");
     }
     public void startDialog(String command) {
 
@@ -53,19 +52,19 @@ public class LogicDialog {
                     isExit = exit(tellFilmCommand);
                 }
                 else {
-                    JSONObject response = apiFilm.takeFilms(Type.valueOf(command), tellFilmCommand);
+                    var response = apiFilm.takeFilms(Type.valueOf(command), tellFilmCommand);
+                    Map<Integer,String> data = response.fetchData();
                     StringBuilder result = new StringBuilder();
-                    if(response.has("Error")){
-                        workWithConsole.print(response.getString("Error"));
+                    if(data.containsKey(-1)) {
+                        workWithConsole.print(data.get(-1));
                     }
                     else if (!command.equals("случайный")) {
-                        JSONArray films = new JSONArray(response.getJSONArray("docs"));
-                        if (films.isEmpty()){
+                        if (!data.containsKey(1)){
                             workWithConsole.print("Не нашлось фильмов с такими характеристиками");
                         }
                         else {
-                            int outputMovieNumber = 0;
-                            final int totalFilms = films.length();
+                            int outputMovieNumber = 1;
+                            final int totalFilms = data.size();
                             command = "еще";
                             while (command.equals("еще")) {
                                 if (outputMovieNumber > totalFilms) {
@@ -73,25 +72,18 @@ public class LogicDialog {
                                     workWithConsole.print(result.toString());
                                     break;
                                 }
-                                JSONObject outFilm = films.getJSONObject(outputMovieNumber);
-                                result.append("Название: ").append(outFilm.get("name")).append("\n");
-                                result.append("Описание: ").append(outFilm.get("description")).append("\n");
-                                JSONObject rating = (outFilm.getJSONObject("rating"));
-                                result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString()).append("\n");
+                                result.append(data.get(outputMovieNumber));
                                 result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
                                 workWithConsole.print(result.toString());
                                 command = workWithConsole.takeArg();
                                 outputMovieNumber++;
                                 result = new StringBuilder();
                             }
-                            workWithConsole.print("Как скажете");
+                            workWithConsole.print("Жду дальнейших команд");
                         }
                     }
                     else {
-                        JSONObject rating = (response.getJSONObject("rating"));
-                        result.append("Название: ").append(response.get("name")).append("\n");
-                        result.append("Описание: ").append(response.get("description")).append("\n");
-                        result.append("Рейтинг кинопоиска: ").append(rating.get("kp").toString());
+                        result.append(data.get(1));
                         workWithConsole.print(result.toString());
                     }
                 }

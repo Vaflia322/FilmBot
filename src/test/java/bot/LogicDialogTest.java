@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -17,20 +18,26 @@ class LogicDialogTest {
         ApiFilm apiFilmMock = mock(ApiFilm.class);
         ConsoleInterface consoleInterfaceMock = mock(ConsoleInterface.class);
         when(consoleInterfaceMock.takeArg()).thenReturn("драма","хватит","стоп");
-        JSONObject result = new JSONObject();
-        JSONArray docs = new JSONArray();
-        JSONObject film1 = new JSONObject().put("name","НАЗВАНИЕ").put("description","ОПИСАНИЕ");
-        JSONObject rating = new JSONObject().put("kp","РЕЙТИНГ");
-        film1.put("rating",rating);
-        docs.put(film1);
-        result.put("docs",docs);
-        when(apiFilmMock.takeFilms(Type.valueOf("жанр"),"драма")).thenReturn(result);
+        Films films = new Films();
+        films.addFilm(1,"НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ");
+        when(apiFilmMock.takeFilms(Type.жанр,"драма")).thenReturn(films);
         LogicDialog logicDialog= new LogicDialog(apiFilmMock,consoleInterfaceMock);
-        //String input = "драма\nхватит\nстоп";
-        //ByteArrayInputStream in = new ByteArrayInputStream(input.getBytes());
-        //System.setIn(in);
         logicDialog.startDialog("жанр");
         verify(apiFilmMock).takeFilms(Type.valueOf("жанр"),"драма");
-        //System.setIn(System.in);
+    }
+    @Test
+    public void apiGenreTestException(){
+        ApiFilm apiFilmMock = mock(ApiFilm.class);
+        ConsoleInterface consoleInterfaceMock = mock(ConsoleInterface.class);
+        when(consoleInterfaceMock.takeArg()).thenReturn("любой","хватит","стоп");
+        when(apiFilmMock.takeFilms(Type.жанр,"любой")).thenThrow(new RuntimeException("Ошибка"));
+        LogicDialog logicDialog= new LogicDialog(apiFilmMock,consoleInterfaceMock);
+        try {
+            logicDialog.startDialog("жанр");
+        } catch(RuntimeException e){
+            System.out.println(e.getMessage());
+            assertEquals("Ошибка",e.getMessage());
+        }
+        verify(apiFilmMock).takeFilms(Type.valueOf("жанр"),"любой");
     }
 }

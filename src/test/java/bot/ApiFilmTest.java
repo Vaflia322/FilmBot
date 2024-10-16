@@ -1,21 +1,22 @@
 package bot;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 class ApiFilmTest {
+    private final ApiFilm apiFilm = new ApiFilm();
     @Test
     void incorrectGenreResultEquals() {
-        ApiFilm apiFilm = new ApiFilm();
-        Object result = apiFilm.takeFilms(Type.valueOf("жанр"),"123");
-        assertEquals(result.toString(),"Вы ввели некорректный жанр");
+        var response = apiFilm.takeFilms(Type.жанр,"драма");
+        Map<Integer,String> data = response.fetchData();
+        assertTrue(data.containsKey(1));
     }
     @Test
     void incorrectGenreResultNotEquals() {
-        ApiFilm apiFilm = new ApiFilm();
-        Object result = apiFilm.takeFilms(Type.valueOf("жанр"),"123");
+        Object result = apiFilm.takeFilms(Type.жанр,"123");
         assertNotEquals(result.toString(),"Вот ваш фильм");
     }
 }
