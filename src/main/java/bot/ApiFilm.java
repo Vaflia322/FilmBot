@@ -23,50 +23,47 @@ public class ApiFilm {
             throw new RuntimeException("Файл не найден");
         }
     }
-
-
     private final RequestValidation requestValidation = new RequestValidation();
-    public Error error = new Error();
-    public Films films = new Films();
-    public ApiObject takeFilms(Type type, String request){
+    private final Fault fault = new Fault();
+    private final Movies movies = new Movies();
+    public ApiObject takeFilms(TypeOfFilm typeOfFilm, String request){
         final StringBuilder urlRequest = new StringBuilder().append(queryBasis);
-        //JSONObject result = new JSONObject();
-        switch (type){
-            case название:
+        switch (typeOfFilm){
+            case NAME:
                 if (!requestValidation.isNameExists(request)){
-                    error.setError("Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ");
-                    return error;
+                    fault.setError("Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ");
+                    return fault;
                 }
                 urlRequest.append("/search?query=");
                 break;
-            case жанр:
+            case GENRE:
                 if (!requestValidation.isGenreExists(request)){
-                    error.setError("Вы ввели некорректный жанр");
-                    return error;
+                    fault.setError("Вы ввели некорректный жанр");
+                    return fault;
                 }
                 urlRequest.append("?genres.name=");
                 break;
-            case рейтинг:
+            case RATING:
                 if (!requestValidation.isRatingExists(request)){
-                    error.setError("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\nТакже можете указать диапазон,например 7.3-9");
-                    return error;
+                    fault.setError("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\nТакже можете указать диапазон,например 7.3-9");
+                    return fault;
                 }
                 urlRequest.append("?rating.kp=");
                 break;
-            case год:
+            case YEAR:
                 if (!requestValidation.isYearExists(request)){
-                    error.setError("Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023");
-                    return error;
+                    fault.setError("Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023");
+                    return fault;
                 }
                 urlRequest.append("?year=");
                 break;
-            case случайный:
+            case RANDOM:
                 request = "";
                 urlRequest.append("/random?");
                 break;
             default:
-                error.setError("Некорректный запрос");
-                return error;
+                fault.setError("Некорректный запрос");
+                return fault;
         }
         request = URLEncoder.encode(request, StandardCharsets.UTF_8);
         urlRequest.append(request).append("&notNullFields=name&notNullFields=description&notNullFields=rating.kp");
@@ -75,8 +72,8 @@ public class ApiFilm {
             url = new URL(urlRequest.toString());
         }
         catch (MalformedURLException e){
-            error.setError("Ошибка при создании URL");
-            return error;
+            fault.setError("Ошибка при создании URL");
+            return fault;
         }
         HttpURLConnection con;
         try{
@@ -84,8 +81,8 @@ public class ApiFilm {
             con.setRequestMethod("GET");
         }
         catch (Exception e){
-            error.setError("Ошибка при установке соединения");
-            return error;
+            fault.setError("Ошибка при установке соединения");
+            return fault;
         }
         con.setRequestProperty("X-API-Key",apiKey );
         int responseCode;
@@ -93,37 +90,37 @@ public class ApiFilm {
             responseCode = con.getResponseCode();
         }
         catch (Exception e){
-            error.setError("Ошибка при получении запроса со стороны API");
-            return error;
+            fault.setError("Ошибка при получении запроса со стороны API");
+            return fault;
         }
         if (responseCode!=200){
-            error.setError("Сервис временно не доступен");
-            return error;
+            fault.setError("Сервис временно не доступен");
+            return fault;
         }
         BufferedReader reader;
         try{
             reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
         }
         catch (Exception e){
-            error.setError("Ошибка при прочтении запроса к API");
-            return error;
+            fault.setError("Ошибка при прочтении запроса к API");
+            return fault;
         }
         JSONObject response;
         try{
             response = new JSONObject(reader.readLine());
         }
         catch(Exception e){
-            error.setError("Ошибка при прочтении запроса к API");
-            return error;
+            fault.setError("Ошибка при прочтении запроса к API");
+            return fault;
         }
 
         try{
             reader.close();
         }
         catch(Exception e){
-            error.setError("Ошибка при закрытии потока чтения");
+            fault.setError("Ошибка при закрытии потока чтения");
         }
-        if (!type.equals(Type.случайный)){
+        if (!typeOfFilm.equals(TypeOfFilm.RANDOM)){
             JSONArray docs = new JSONArray(response.getJSONArray("docs"));
             for (int i = 0; i< docs.length(); i++) {
                 JSONObject film = docs.getJSONObject(i);
@@ -131,7 +128,7 @@ public class ApiFilm {
                 String description = film.getString("description");
                 JSONObject ratings = (film.getJSONObject("rating"));
                 String rating = ratings.get("kp").toString();
-                films.addFilm(i+1,name,description,rating);
+                movies.addFilm(name,description,rating);
             }
         }
         else{
@@ -139,10 +136,10 @@ public class ApiFilm {
             String name = response.getString("name");
             String description = response.getString("description");
             String rating = ratings.get("kp").toString();
-            films.addFilm(1,name,description,rating);
+            movies.addFilm(name,description,rating);
 
         }
-        return films;
+        return movies;
     }
 }
 

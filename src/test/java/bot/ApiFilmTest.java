@@ -2,6 +2,7 @@ package bot;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,14 +10,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class ApiFilmTest {
     private final ApiFilm apiFilm = new ApiFilm();
     @Test
-    void incorrectGenreResultEquals() {
-        var response = apiFilm.takeFilms(Type.жанр,"драма");
-        Map<Integer,String> data = response.fetchData();
-        assertTrue(data.containsKey(1));
+    void correctGenreResultTrue() {
+        Movies response = (Movies) apiFilm.takeFilms(TypeOfFilm.GENRE,"драма");
+        ArrayList<String> result = response.getFilms();
+        assertFalse(result.isEmpty());
     }
     @Test
     void incorrectGenreResultNotEquals() {
-        Object result = apiFilm.takeFilms(Type.жанр,"123");
-        assertNotEquals(result.toString(),"Вот ваш фильм");
+        Fault result = (Fault) apiFilm.takeFilms(TypeOfFilm.GENRE,"123");
+        assertNotEquals(result.getError(),"Вот ваш фильм");
     }
 }
