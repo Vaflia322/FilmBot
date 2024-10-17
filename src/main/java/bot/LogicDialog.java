@@ -71,14 +71,14 @@ public class LogicDialog {
                             workWithConsole.print(fault.getError());
                         }
                         case Movies movies -> {
-                            ArrayList<String> array = movies.getFilms();
+                            ArrayList<String> films = movies.getFilms();
                             StringBuilder result = new StringBuilder();
                             if (!command.equals("случайный")) {
-                                if (array.isEmpty()) {
+                                if (films.isEmpty()) {
                                     workWithConsole.print("Не нашлось фильмов с такими характеристиками");
                                 } else {
                                     int outputMovieNumber = 0;
-                                    final int totalFilms = array.size();
+                                    final int totalFilms = films.size();
                                     command = "еще";
                                     while (command.equals("еще")) {
                                         if (outputMovieNumber > totalFilms) {
@@ -86,7 +86,7 @@ public class LogicDialog {
                                             workWithConsole.print(result.toString());
                                             break;
                                         }
-                                        result.append(array.get(outputMovieNumber));
+                                        result.append(films.get(outputMovieNumber));
                                         result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
                                         workWithConsole.print(result.toString());
                                         command = workWithConsole.takeArg();
@@ -96,7 +96,7 @@ public class LogicDialog {
                                     workWithConsole.print("Жду дальнейших команд");
                                 }
                             } else {
-                                result.append(array.getFirst());
+                                result.append(films.getFirst());
                                 workWithConsole.print(result.toString());
                             }
                         }
