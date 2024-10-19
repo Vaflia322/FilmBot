@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
-    private final String queryBasis = "https://api.kinopoisk.dev/v1.4/movie";
+    private final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
     {
         try {
             fileReader = new BufferedReader(new FileReader("api-key.txt"));
@@ -24,36 +24,39 @@ public class ApiFilm {
         }
     }
     private final RequestValidation requestValidation = new RequestValidation();
-    private final Fault fault = new Fault();
     private final Movies movies = new Movies();
-    public ApiObject takeFilms(TypeOfFilm typeOfFilm, String request){
-        final StringBuilder urlRequest = new StringBuilder().append(queryBasis);
-        switch (typeOfFilm){
+    private Film takeMovieFormJSONObject(JSONObject docs){
+        String name = docs.getString("name");
+        String description = docs.getString("description");
+        JSONObject ratings = (docs.getJSONObject("rating"));
+        String rating = ratings.get("kp").toString();
+        return (new Film(name,description,rating));
+    }
+    public ApiObject takeFilms(TypeOfFilmRequest typeOfFilmRequest, String request){
+        final StringBuilder urlRequest = new StringBuilder().append(BASE_URL);
+        switch (typeOfFilmRequest){
             case NAME:
                 if (!requestValidation.isNameExists(request)){
-                    fault.setError("Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ");
-                    return fault;
+                    return new Fault("Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ");
                 }
                 urlRequest.append("/search?query=");
                 break;
             case GENRE:
                 if (!requestValidation.isGenreExists(request)){
-                    fault.setError("Вы ввели некорректный жанр");
-                    return fault;
+                    return new Fault("Вы ввели некорректный жанр");
+
                 }
                 urlRequest.append("?genres.name=");
                 break;
             case RATING:
                 if (!requestValidation.isRatingExists(request)){
-                    fault.setError("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\nТакже можете указать диапазон,например 7.3-9");
-                    return fault;
+                    return new Fault("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\nТакже можете указать диапазон,например 7.3-9");
                 }
                 urlRequest.append("?rating.kp=");
                 break;
             case YEAR:
                 if (!requestValidation.isYearExists(request)){
-                    fault.setError("Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023");
-                    return fault;
+                    return new Fault("Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023");
                 }
                 urlRequest.append("?year=");
                 break;
@@ -62,8 +65,7 @@ public class ApiFilm {
                 urlRequest.append("/random?");
                 break;
             default:
-                fault.setError("Некорректный запрос");
-                return fault;
+                return new Fault("Некорректный запрос");
         }
         request = URLEncoder.encode(request, StandardCharsets.UTF_8);
         urlRequest.append(request).append("&notNullFields=name&notNullFields=description&notNullFields=rating.kp");
@@ -72,8 +74,7 @@ public class ApiFilm {
             url = new URL(urlRequest.toString());
         }
         catch (MalformedURLException e){
-            fault.setError("Ошибка при создании URL");
-            return fault;
+            return new Fault("Ошибка при создании URL");
         }
         HttpURLConnection con;
         try{
@@ -81,8 +82,7 @@ public class ApiFilm {
             con.setRequestMethod("GET");
         }
         catch (Exception e){
-            fault.setError("Ошибка при установке соединения");
-            return fault;
+            return new Fault("Ошибка при установке соединения");
         }
         con.setRequestProperty("X-API-Key",apiKey );
         int responseCode;
@@ -90,53 +90,41 @@ public class ApiFilm {
             responseCode = con.getResponseCode();
         }
         catch (Exception e){
-            fault.setError("Ошибка при получении запроса со стороны API");
-            return fault;
+            return new Fault("Ошибка при получении запроса со стороны API");
         }
         if (responseCode!=200){
-            fault.setError("Сервис временно не доступен");
-            return fault;
+            return new Fault("Сервис временно не доступен");
         }
         BufferedReader reader;
         try{
             reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
         }
         catch (Exception e){
-            fault.setError("Ошибка при прочтении запроса к API");
-            return fault;
+            return new Fault("Ошибка при прочтении запроса к API");
         }
         JSONObject response;
         try{
             response = new JSONObject(reader.readLine());
         }
         catch(Exception e){
-            fault.setError("Ошибка при прочтении запроса к API");
-            return fault;
+            return new Fault("Ошибка при прочтении запроса к API");
         }
 
         try{
             reader.close();
         }
         catch(Exception e){
-            fault.setError("Ошибка при закрытии потока чтения");
+            return new Fault("Ошибка при закрытии потока чтения");
         }
-        if (!typeOfFilm.equals(TypeOfFilm.RANDOM)){
+        if (!typeOfFilmRequest.equals(TypeOfFilmRequest.RANDOM)){
             JSONArray docs = new JSONArray(response.getJSONArray("docs"));
             for (int i = 0; i< docs.length(); i++) {
                 JSONObject film = docs.getJSONObject(i);
-                String name = film.getString("name");
-                String description = film.getString("description");
-                JSONObject ratings = (film.getJSONObject("rating"));
-                String rating = ratings.get("kp").toString();
-                movies.addFilm(name,description,rating);
+                movies.addFilm(takeMovieFormJSONObject(film));
             }
         }
         else{
-            JSONObject ratings = (response.getJSONObject("rating"));
-            String name = response.getString("name");
-            String description = response.getString("description");
-            String rating = ratings.get("kp").toString();
-            movies.addFilm(name,description,rating);
+            movies.addFilm(takeMovieFormJSONObject(response));
 
         }
         return movies;

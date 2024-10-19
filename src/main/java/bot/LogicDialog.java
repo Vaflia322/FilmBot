@@ -1,12 +1,13 @@
 package bot;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.Set;
 
 public class LogicDialog {
     private final ApiFilm apiFilm;
     private final ConsoleInterface workWithConsole;
-
     public LogicDialog(ApiFilm apiFilm, ConsoleInterface workWithConsole) {
         this.apiFilm = apiFilm;
         this.workWithConsole = workWithConsole;
@@ -15,22 +16,6 @@ public class LogicDialog {
 
     private boolean exit(String command) {
         return !command.equals("стоп");
-    }
-    private TypeOfFilm commandToEnum(String command){
-        switch(command){
-            case("жанр"):
-                return TypeOfFilm.GENRE;
-            case("рейтинг"):
-                return TypeOfFilm.RATING;
-            case("случайный"):
-                return TypeOfFilm.RANDOM;
-            case("год"):
-                return TypeOfFilm.YEAR;
-            case("название"):
-                return TypeOfFilm.NAME;
-            default:
-                throw new IllegalStateException("Unexpected value: " + command);
-        }
     }
     public void startDialog(String command) {
 
@@ -65,39 +50,34 @@ public class LogicDialog {
                     workWithConsole.print(commandStorage.parsingSupportedCommand(tellFilmCommand));
                     isRunning = exit(tellFilmCommand);
                 } else {
-                    var response = apiFilm.takeFilms(commandToEnum(command), tellFilmCommand);
+                    ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
                     switch (response) {
                         case Fault fault -> {
                             workWithConsole.print(fault.getError());
                         }
                         case Movies movies -> {
-                            ArrayList<String> films = movies.getFilms();
+                            ArrayDeque<Film> films = movies.getFilms();
                             StringBuilder result = new StringBuilder();
                             if (!command.equals("случайный")) {
                                 if (films.isEmpty()) {
                                     workWithConsole.print("Не нашлось фильмов с такими характеристиками");
                                 } else {
-                                    int outputMovieNumber = 0;
-                                    final int totalFilms = films.size();
                                     command = "еще";
                                     while (command.equals("еще")) {
-                                        if (outputMovieNumber > totalFilms) {
-                                            result.append("Фильмы кончились");
-                                            workWithConsole.print(result.toString());
+                                        if (films.isEmpty()) {
+                                            workWithConsole.print("Фильмы кончились");
                                             break;
                                         }
-                                        result.append(films.get(outputMovieNumber));
+                                        result.append(films.pop());
                                         result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
                                         workWithConsole.print(result.toString());
                                         command = workWithConsole.takeArg();
-                                        outputMovieNumber++;
                                         result = new StringBuilder();
                                     }
                                     workWithConsole.print("Жду дальнейших команд");
                                 }
                             } else {
-                                result.append(films.getFirst());
-                                workWithConsole.print(result.toString());
+                                workWithConsole.print(films.pop().toString());
                             }
                         }
                         default -> workWithConsole.print("Неизвестная ошибка");

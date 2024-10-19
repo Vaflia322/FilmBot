@@ -10,11 +10,10 @@ public class Film{
         this.description = description;
         this.rating = rating;
     }
-
-    public String getStringFilm(){
-        StringBuilder result = new StringBuilder().append("Название: ").append(name).append("\n");
-        result.append("Описание: ").append(description).append("\n");
-        result.append("Рейтинг кинопоиска: ").append(rating).append("\n");
-        return result.toString();
+    @Override
+    public String toString(){
+        return "Название: " + name + "\n" +
+                "Описание: " + description + "\n" +
+                "Рейтинг кинопоиска: " + rating + "\n";
     }
 }

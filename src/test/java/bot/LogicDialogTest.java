@@ -14,18 +14,18 @@ class LogicDialogTest {
         ConsoleInterface consoleInterfaceMock = mock(ConsoleInterface.class);
         when(consoleInterfaceMock.takeArg()).thenReturn("драма","хватит","стоп");
         Movies movies = new Movies();
-        movies.addFilm("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ");
-        when(apiFilmMock.takeFilms(TypeOfFilm.GENRE,"драма")).thenReturn(movies);
+        movies.addFilm(new Film("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ"));
+        when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"драма")).thenReturn(movies);
         LogicDialog logicDialog= new LogicDialog(apiFilmMock,consoleInterfaceMock);
         logicDialog.startDialog("жанр");
-        verify(apiFilmMock).takeFilms(TypeOfFilm.GENRE,"драма");
+        verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE,"драма");
     }
     @Test
     public void apiGenreTestException(){
         ApiFilm apiFilmMock = mock(ApiFilm.class);
         ConsoleInterface consoleInterfaceMock = mock(ConsoleInterface.class);
         when(consoleInterfaceMock.takeArg()).thenReturn("любой","хватит","стоп");
-        when(apiFilmMock.takeFilms(TypeOfFilm.GENRE,"любой")).thenThrow(new RuntimeException("Ошибка"));
+        when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"любой")).thenThrow(new RuntimeException("Ошибка"));
         LogicDialog logicDialog= new LogicDialog(apiFilmMock,consoleInterfaceMock);
         try {
             logicDialog.startDialog("жанр");
@@ -33,6 +33,6 @@ class LogicDialogTest {
             System.out.println(e.getMessage());
             assertEquals("Ошибка",e.getMessage());
         }
-        verify(apiFilmMock).takeFilms(TypeOfFilm.GENRE,"любой");
+        verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE,"любой");
     }
 }

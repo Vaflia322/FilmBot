@@ -1,15 +1,14 @@
 package bot;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public final class Movies extends ApiObject{
-    private final ArrayList<String> films = new ArrayList<>();
-    public void addFilm(String name, String description,String rating){
-        Film film = new Film(name,description,rating);
-        films.add(film.getStringFilm());
+    private final ArrayDeque<Film> films = new ArrayDeque<>();
+    public void addFilm(Film film){
+        films.addFirst(film);
     }
 
-    public ArrayList<String> getFilms() {
+    public ArrayDeque<Film> getFilms() {
         return films;
     }
 }
