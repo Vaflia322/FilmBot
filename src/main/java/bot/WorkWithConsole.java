@@ -1,6 +1,6 @@
 package bot;
 import java.util.Scanner;
-public class WorkWithDialog implements DialogInterface {
+public class WorkWithConsole implements DialogInterface {
     private Scanner scanner = new Scanner(System.in);
     public String takeArg(){
         String result = scanner.nextLine();
