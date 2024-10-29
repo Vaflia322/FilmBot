@@ -11,28 +11,23 @@ class LogicDialogTest {
     @Test
     public void apiGenreDramaTest(){
         ApiFilm apiFilmMock = mock(ApiFilm.class);
-        ConsoleInterface consoleInterfaceMock = mock(ConsoleInterface.class);
-        when(consoleInterfaceMock.takeArg()).thenReturn("драма","хватит","стоп");
+        DialogInterface dialogInterfaceMock = mock(DialogInterface.class);
+        when(dialogInterfaceMock.takeArg()).thenReturn("драма","хватит","стоп");
         Movies movies = new Movies();
-        movies.addFilm(new Film("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ"));
+        movies.addFilm(new Record("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ","ЖАНРЫ"));
         when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"драма")).thenReturn(movies);
-        LogicDialog logicDialog= new LogicDialog(apiFilmMock,consoleInterfaceMock);
+        LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogInterfaceMock);
         logicDialog.startDialog("жанр");
         verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE,"драма");
     }
     @Test
-    public void apiGenreTestException(){
+    public void apiGenreTestFault(){
         ApiFilm apiFilmMock = mock(ApiFilm.class);
-        ConsoleInterface consoleInterfaceMock = mock(ConsoleInterface.class);
-        when(consoleInterfaceMock.takeArg()).thenReturn("любой","хватит","стоп");
-        when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"любой")).thenThrow(new RuntimeException("Ошибка"));
-        LogicDialog logicDialog= new LogicDialog(apiFilmMock,consoleInterfaceMock);
-        try {
-            logicDialog.startDialog("жанр");
-        } catch(RuntimeException e){
-            System.out.println(e.getMessage());
-            assertEquals("Ошибка",e.getMessage());
-        }
+        DialogInterface dialogInterfaceMock = mock(DialogInterface.class);
+        when(dialogInterfaceMock.takeArg()).thenReturn("любой","хватит","стоп");
+        when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"любой")).thenReturn(new Fault("Вы ввели некоректный жанр"));
+        LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogInterfaceMock);
+        logicDialog.startDialog("жанр");
         verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE,"любой");
     }
 }

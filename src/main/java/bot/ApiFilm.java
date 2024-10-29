@@ -24,15 +24,22 @@ public class ApiFilm {
         }
     }
     private final RequestValidation requestValidation = new RequestValidation();
-    private final Movies movies = new Movies();
-    private Film takeMovieFormJSONObject(JSONObject docs){
+    private Record getFilmFromJSONObject(JSONObject docs){
         String name = docs.getString("name");
         String description = docs.getString("description");
         JSONObject ratings = (docs.getJSONObject("rating"));
         String rating = ratings.get("kp").toString();
-        return (new Film(name,description,rating));
+        JSONArray genres = docs.getJSONArray("genres");
+        StringBuilder genre = new StringBuilder();
+        for (int i = 0;i<genres.length();i++){
+            JSONObject object = genres.getJSONObject(i);
+            genre.append(object.getString("name")).append(" ");
+        }
+        genre.append("\n");
+        return new Record(name,description,rating,genre.toString());
     }
     public ApiObject takeFilms(TypeOfFilmRequest typeOfFilmRequest, String request){
+        final Movies movies = new Movies();
         final StringBuilder urlRequest = new StringBuilder().append(BASE_URL);
         switch (typeOfFilmRequest){
             case NAME:
@@ -120,11 +127,11 @@ public class ApiFilm {
             JSONArray docs = new JSONArray(response.getJSONArray("docs"));
             for (int i = 0; i< docs.length(); i++) {
                 JSONObject film = docs.getJSONObject(i);
-                movies.addFilm(takeMovieFormJSONObject(film));
+                movies.addFilm(getFilmFromJSONObject(film));
             }
         }
         else{
-            movies.addFilm(takeMovieFormJSONObject(response));
+            movies.addFilm(getFilmFromJSONObject(response));
 
         }
         return movies;

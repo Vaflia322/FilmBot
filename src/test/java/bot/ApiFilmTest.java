@@ -3,7 +3,7 @@ package bot;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.util.Queue;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,12 +12,14 @@ class ApiFilmTest {
     @Test
     void correctGenreResultTrue() {
         Movies response = (Movies) apiFilm.takeFilms(TypeOfFilmRequest.GENRE,"драма");
-        ArrayDeque<Film> result = response.getFilms();
-        assertFalse(result.pop().toString().isEmpty());
+        Queue<Record> result = response.getFilms();
+        Record record = result.remove();
+        String film = record.toString();
+        assertTrue(film.contains("драма"));
     }
     @Test
     void incorrectGenreResultNotEquals() {
         Fault result = (Fault) apiFilm.takeFilms(TypeOfFilmRequest.GENRE,"123");
-        assertNotEquals(result.getError(),"Вот ваш фильм");
+        assertEquals(result.getError(),"Вы ввели некорректный жанр");
     }
 }
