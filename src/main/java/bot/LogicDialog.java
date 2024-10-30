@@ -1,13 +1,12 @@
 package bot;
 
-import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Set;
 
 public class LogicDialog {
     private final ApiFilm apiFilm;
-    private final DialogInterface workWithConsole;
-    public LogicDialog(ApiFilm apiFilm, DialogInterface workWithConsole) {
+    private final Dialog workWithConsole;
+    public LogicDialog(ApiFilm apiFilm, Dialog workWithConsole) {
         this.apiFilm = apiFilm;
         this.workWithConsole = workWithConsole;
 
@@ -55,19 +54,19 @@ public class LogicDialog {
                             workWithConsole.print(fault.getError());
                         }
                         case Movies movies -> {
-                            Queue<Record> records = movies.getFilms();
+                            Queue<Film> films = movies.getFilms();
                             StringBuilder result = new StringBuilder();
                             if (!command.equals("случайный")) {
-                                if (records.isEmpty()) {
+                                if (films.isEmpty()) {
                                     workWithConsole.print("Не нашлось фильмов с такими характеристиками");
                                 } else {
                                     command = "еще";
                                     while (command.equals("еще")) {
-                                        if (records.isEmpty()) {
+                                        if (films.isEmpty()) {
                                             workWithConsole.print("Фильмы кончились");
                                             break;
                                         }
-                                        result.append(records.remove());
+                                        result.append(films.remove());
                                         result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
                                         workWithConsole.print(result.toString());
                                         command = workWithConsole.takeArg();
@@ -76,7 +75,7 @@ public class LogicDialog {
                                     workWithConsole.print("Жду дальнейших команд");
                                 }
                             } else {
-                                workWithConsole.print(records.remove().toString());
+                                workWithConsole.print(films.remove().toString());
                             }
                         }
                         default -> workWithConsole.print("Неизвестная ошибка");

@@ -1,6 +1,6 @@
 package bot;
 
-public interface DialogInterface {
+public interface Dialog {
     String takeArg();
     void print(String command);
 }

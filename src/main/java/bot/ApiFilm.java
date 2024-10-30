@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-
+import java.util.ArrayList;
 
 
 public class ApiFilm {
@@ -24,19 +24,18 @@ public class ApiFilm {
         }
     }
     private final RequestValidation requestValidation = new RequestValidation();
-    private Record getFilmFromJSONObject(JSONObject docs){
+    private Film getFilmFromJSONObject(JSONObject docs){
         String name = docs.getString("name");
         String description = docs.getString("description");
         JSONObject ratings = (docs.getJSONObject("rating"));
         String rating = ratings.get("kp").toString();
         JSONArray genres = docs.getJSONArray("genres");
-        StringBuilder genre = new StringBuilder();
+        ArrayList<String> genre = new ArrayList<>();
         for (int i = 0;i<genres.length();i++){
             JSONObject object = genres.getJSONObject(i);
-            genre.append(object.getString("name")).append(" ");
+            genre.add(object.getString("name"));
         }
-        genre.append("\n");
-        return new Record(name,description,rating,genre.toString());
+        return new Film(name,description,rating,genre);
     }
     public ApiObject takeFilms(TypeOfFilmRequest typeOfFilmRequest, String request){
         final Movies movies = new Movies();

@@ -4,8 +4,8 @@ public class Main {
     public static void main(String[] args) {
         String command = args[0];
         ApiFilm apiFilm = new ApiFilm();
-        DialogInterface workWithConsole = new WorkWithConsole();
-        LogicDialog logicDialog = new LogicDialog(apiFilm,workWithConsole);
+        Dialog dialog = new ConsoleDialog();
+        LogicDialog logicDialog = new LogicDialog(apiFilm,dialog);
         logicDialog.startDialog(command);
     }
 }

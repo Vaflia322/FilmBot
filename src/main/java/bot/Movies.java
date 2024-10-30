@@ -3,12 +3,12 @@ package bot;
 import java.util.*;
 
 public final class Movies extends ApiObject{
-    private final Queue<Record> records = new LinkedList<>();
-    public void addFilm(Record record){
-        records.add(record);
+    private final Queue<Film> films = new LinkedList<>();
+    public void addFilm(Film film){
+        films.add(film);
     }
 
-    public Queue<Record> getFilms() {
-        return records;
+    public Queue<Film> getFilms() {
+        return films;
     }
 }

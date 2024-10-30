@@ -2,6 +2,9 @@ package bot;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
@@ -11,22 +14,22 @@ class LogicDialogTest {
     @Test
     public void apiGenreDramaTest(){
         ApiFilm apiFilmMock = mock(ApiFilm.class);
-        DialogInterface dialogInterfaceMock = mock(DialogInterface.class);
-        when(dialogInterfaceMock.takeArg()).thenReturn("драма","хватит","стоп");
+        Dialog dialogMock = mock(Dialog.class);
+        when(dialogMock.takeArg()).thenReturn("драма","хватит","стоп");
         Movies movies = new Movies();
-        movies.addFilm(new Record("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ","ЖАНРЫ"));
+        movies.addFilm(new Film("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ",new ArrayList<>(List.of("драма"))));
         when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"драма")).thenReturn(movies);
-        LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogInterfaceMock);
+        LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogMock);
         logicDialog.startDialog("жанр");
         verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE,"драма");
     }
     @Test
     public void apiGenreTestFault(){
         ApiFilm apiFilmMock = mock(ApiFilm.class);
-        DialogInterface dialogInterfaceMock = mock(DialogInterface.class);
-        when(dialogInterfaceMock.takeArg()).thenReturn("любой","хватит","стоп");
+        Dialog dialogMock = mock(Dialog.class);
+        when(dialogMock.takeArg()).thenReturn("любой","хватит","стоп");
         when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"любой")).thenReturn(new Fault("Вы ввели некоректный жанр"));
-        LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogInterfaceMock);
+        LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogMock);
         logicDialog.startDialog("жанр");
         verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE,"любой");
     }
