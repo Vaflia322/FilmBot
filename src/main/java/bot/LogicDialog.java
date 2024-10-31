@@ -5,10 +5,10 @@ import java.util.Set;
 
 public class LogicDialog {
     private final ApiFilm apiFilm;
-    private final Dialog workWithConsole;
-    public LogicDialog(ApiFilm apiFilm, Dialog workWithConsole) {
+    private final Dialog dialog;
+    public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
         this.apiFilm = apiFilm;
-        this.workWithConsole = workWithConsole;
+        this.dialog = dialog;
 
     }
 
@@ -18,74 +18,74 @@ public class LogicDialog {
     public void startDialog(String command) {
 
         CommandStorage commandStorage = new CommandStorage();
-        workWithConsole.print("Привет! Я фильм бот.");
+        dialog.print("Привет! Я фильм бот.");
         boolean isRunning = true;
         while (isRunning) {
             if (!commandStorage.isCommand(command)) {
-                workWithConsole.print(commandStorage.parsingSupportedCommand("-help"));
-                command = workWithConsole.takeArg();
+                dialog.print(commandStorage.parsingSupportedCommand("-help"));
+                command = dialog.takeArg();
                 continue;
             }
             if (commandStorage.isSupportedCommand(command)) {
-                workWithConsole.print(commandStorage.parsingSupportedCommand(command));
+                dialog.print(commandStorage.parsingSupportedCommand(command));
                 isRunning = exit(command);
             }
             if (commandStorage.isSupportedFilmsCommand(command)) {
-                workWithConsole.print(commandStorage.parsingSupportedFilmsCommand(command));
+                dialog.print(commandStorage.parsingSupportedFilmsCommand(command));
                 String tellFilmCommand;
                 if (!command.contains("случайный")) {
-                    tellFilmCommand = workWithConsole.takeArg();
+                    tellFilmCommand = dialog.takeArg();
                     if (tellFilmCommand.contains("список")) {
                         Set<String> genres = commandStorage.getGenres();
                         String stringGenres = String.join(", ", genres);
-                        workWithConsole.print(stringGenres);
-                        tellFilmCommand = workWithConsole.takeArg();
+                        dialog.print(stringGenres);
+                        tellFilmCommand = dialog.takeArg();
                     }
                 } else {
                     tellFilmCommand = "случайный";
                 }
                 if (tellFilmCommand.equals("стоп") || tellFilmCommand.equals("-help")) {
-                    workWithConsole.print(commandStorage.parsingSupportedCommand(tellFilmCommand));
+                    dialog.print(commandStorage.parsingSupportedCommand(tellFilmCommand));
                     isRunning = exit(tellFilmCommand);
                 } else {
                     ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
                     switch (response) {
                         case Fault fault -> {
-                            workWithConsole.print(fault.getError());
+                            dialog.print(fault.getError());
                         }
                         case Movies movies -> {
                             Queue<Film> films = movies.getFilms();
                             StringBuilder result = new StringBuilder();
                             if (!command.equals("случайный")) {
                                 if (films.isEmpty()) {
-                                    workWithConsole.print("Не нашлось фильмов с такими характеристиками");
+                                    dialog.print("Не нашлось фильмов с такими характеристиками");
                                 } else {
                                     command = "еще";
                                     while (command.equals("еще")) {
                                         if (films.isEmpty()) {
-                                            workWithConsole.print("Фильмы кончились");
+                                            dialog.print("Фильмы кончились");
                                             break;
                                         }
                                         result.append(films.remove());
                                         result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
-                                        workWithConsole.print(result.toString());
-                                        command = workWithConsole.takeArg();
+                                        dialog.print(result.toString());
+                                        command = dialog.takeArg();
                                         result = new StringBuilder();
                                     }
-                                    workWithConsole.print("Жду дальнейших команд");
+                                    dialog.print("Жду дальнейших команд");
                                 }
                             } else {
-                                workWithConsole.print(films.remove().toString());
+                                dialog.print(films.remove().toString());
                             }
                         }
-                        default -> workWithConsole.print("Неизвестная ошибка");
+                        default -> dialog.print("Неизвестная ошибка");
                     }
                 }
             }
             if (!isRunning) {
                 continue;
             }
-            command = workWithConsole.takeArg();
+            command = dialog.takeArg();
         }
     }
 }

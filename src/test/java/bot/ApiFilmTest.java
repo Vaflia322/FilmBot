@@ -3,6 +3,7 @@ package bot;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,7 @@ class ApiFilmTest {
         Movies response = (Movies) apiFilm.takeFilms(TypeOfFilmRequest.GENRE,"драма");
         Queue<Film> result = response.getFilms();
         Film film = result.remove();
-        ArrayList<String> genres = film.genres();
+        List<String> genres = film.genres();
         assertTrue(genres.contains("драма"));
     }
     @Test

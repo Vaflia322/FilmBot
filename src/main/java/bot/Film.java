@@ -1,18 +1,19 @@
 package bot;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public record Film(String name, String description, String rating, ArrayList<String> genres) {
+public record Film(String name, String description, String rating, List<String> genres) {
     @Override
     public String toString(){
-        StringBuilder genresBuilder = new StringBuilder();
+        String genresString = new String();
         for (String genre:genres){
-            genresBuilder.append(genre).append(" ");
+            genresString.join(genre).join(" ");
         }
         return "Название: " + name + "\n" +
                 "Описание: " + description + "\n" +
                 "Рейтинг кинопоиска: " + rating + "\n"+
-                "Жанры: " + genresBuilder+"\n";
+                "Жанры: " + genresString+"\n";
 
     }
 }

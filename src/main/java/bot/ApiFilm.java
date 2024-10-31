@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ApiFilm {
@@ -30,7 +31,7 @@ public class ApiFilm {
         JSONObject ratings = (docs.getJSONObject("rating"));
         String rating = ratings.get("kp").toString();
         JSONArray genres = docs.getJSONArray("genres");
-        ArrayList<String> genre = new ArrayList<>();
+        List<String> genre = new ArrayList<>();
         for (int i = 0;i<genres.length();i++){
             JSONObject object = genres.getJSONObject(i);
             genre.add(object.getString("name"));
