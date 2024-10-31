@@ -1,6 +1,5 @@
 package bot;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public record Film(String name, String description, String rating, List<String> genres) {
