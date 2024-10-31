@@ -17,7 +17,7 @@ class LogicDialogTest {
         Dialog dialogMock = mock(Dialog.class);
         when(dialogMock.takeArg()).thenReturn("драма","хватит","стоп");
         Movies movies = new Movies();
-        movies.addFilm(new Film("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ",new ArrayList<>(List.of("драма"))));
+        movies.addFilm(new Film("НАЗВАНИЕ","ОПИСАНИЕ","РЕЙТИНГ",List.of("драма")));
         when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE,"драма")).thenReturn(movies);
         LogicDialog logicDialog= new LogicDialog(apiFilmMock, dialogMock);
         logicDialog.startDialog("жанр");
