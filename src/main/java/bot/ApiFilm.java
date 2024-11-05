@@ -30,9 +30,9 @@ public class ApiFilm {
         String description = docs.getString("description");
         JSONObject ratings = (docs.getJSONObject("rating"));
         String rating = ratings.get("kp").toString();
-        JSONArray genres = docs.getJSONArray("genres");
+        JSONArray genres =docs.getJSONArray("genres");
         List<String> genre = new ArrayList<>();
-        for (int i = 0;i<genres.length();i++){
+        for (int i =0;i<genres.length();i++){
             JSONObject object = genres.getJSONObject(i);
             genre.add(object.getString("name"));
         }

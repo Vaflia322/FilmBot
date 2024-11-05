@@ -1,6 +1,6 @@
 package bot;
 
 public interface Dialog {
-    String takeArg();
-    void print(String command);
+    UserMessage takeArg(User user);
+    void print(User user, String command);
 }

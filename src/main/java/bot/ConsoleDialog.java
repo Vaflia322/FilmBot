@@ -2,12 +2,12 @@ package bot;
 import java.util.Scanner;
 public class ConsoleDialog implements Dialog {
     private Scanner scanner = new Scanner(System.in);
-    public String takeArg(){
+    public UserMessage takeArg(User user){
         String result = scanner.nextLine();
         result = result.toLowerCase();
-        return result;
+        return new UserMessage(new User(1), result);
     }
-    public void print(String command) {
+    public void print(User user, String command) {
         System.out.println(command);
     }
 }
