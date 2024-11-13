@@ -6,92 +6,109 @@ import java.util.Set;
 public class LogicDialog {
     private final ApiFilm apiFilm;
     private final Dialog dialog;
-    private boolean isRunning = true;
+    private final CommandStorage commandStorage = new CommandStorage();
 
     public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
         this.apiFilm = apiFilm;
         this.dialog = dialog;
     }
-
-    public boolean getIsRunning() {
-        return isRunning;
+    public void statusProcessing(User user, String state, String command){
+        switch (state) {
+            case ("characteristicType"):
+                characteristicType(user,command);
+                break;
+            case ("getGenre"):
+                getGenre(user);
+                break;
+            case ("baseCommand"), "end":
+                baseCommand(user,command);
+                break;
+            case ("request"):
+                requestToApi(user);
+                break;
+            case ("getFilms"):
+                printFilms(user,command);
+                break;
+        }
     }
-
-    private boolean exit(String command) {
-        return !command.equals("стоп");
+    public String makeState(User user,String command) {
+        if (TypeOfFilmRequest.commandToEnum(command) != null) {
+            user.setApiRequest("characteristicType",command);
+            return "characteristicType";
+        }
+        if ("список".equals(command)) {
+            return "getGenre";
+        }
+        if (user.getApiRequest().containsKey("characteristicType")) {
+            user.setApiRequest("request", command);
+            return "request";
+        }
+        if (command.equals("еще") || command.equals("хватит")) {
+            return "getFilms";
+        }
+        if (command.equals("стоп")){
+            return "end";
+        }
+        return "baseCommand";
     }
-
-    public void startDialog(User user) {
-        CommandStorage commandStorage = new CommandStorage();
-        UserMessage userMessage = dialog.takeArg(user);
-        String command = userMessage.getMessage();
-        dialog.print(user, "Привет! Я фильм бот.");
-        while (isRunning) {
-            if (!commandStorage.isCommand(command)) {
-                dialog.print(user, commandStorage.parsingSupportedCommand("-help"));
-                command = dialog.takeArg(user).getMessage();
-                continue;
+    private void baseCommand(User user, String command) {
+        if (!commandStorage.isCommand(command)) {
+            dialog.print(user, commandStorage.parsingSupportedCommand("-help"));
+        }
+        if (commandStorage.isSupportedCommand(command)) {
+            dialog.print(user, commandStorage.parsingSupportedCommand(command));
+        }
+        if (commandStorage.isSupportedFilmsCommand(command)) {
+            dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
+        }
+    }
+    private void getGenre (User user){
+        Set<String> genres = commandStorage.getGenres();
+        String stringGenres = String.join(", ", genres);
+        dialog.print(user, stringGenres);
+    }
+    private void characteristicType(User user, String command) {
+        dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
+    }
+    private void requestToApi(User user) {
+        String command = user.getApiRequest().get("characteristicType");
+        String tellFilmCommand = user.getApiRequest().get("request");
+        user.getApiRequest().remove("characteristicType");
+        ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
+        switch (response) {
+            case Fault fault -> {
+                dialog.print(user, fault.getError());
             }
-            if (commandStorage.isSupportedCommand(command)) {
-                dialog.print(user, commandStorage.parsingSupportedCommand(command));
-                isRunning = exit(command);
-            }
-            if (commandStorage.isSupportedFilmsCommand(command)) {
-                dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
-                String tellFilmCommand;
-                if (!command.contains("случайный")) {
-                    tellFilmCommand = dialog.takeArg(user).getMessage();
-                    if (tellFilmCommand.contains("список")) {
-                        Set<String> genres = commandStorage.getGenres();
-                        String stringGenres = String.join(", ", genres);
-                        dialog.print(user, stringGenres);
-                        tellFilmCommand = dialog.takeArg(user).getMessage();
-                    }
-                } else {
-                    tellFilmCommand = "случайный";
+            case Movies movies -> {
+                Queue<Film> films = movies.getFilms();
+                user.setFilms(films);
+                if (films.isEmpty()) {
+                    dialog.print(user, "Не нашлось фильмов с такими характеристиками");
                 }
-                if (tellFilmCommand.equals("стоп") || tellFilmCommand.equals("-help")) {
-                    dialog.print(user, commandStorage.parsingSupportedCommand(tellFilmCommand));
-                    isRunning = exit(tellFilmCommand);
-                } else {
-                    ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
-                    switch (response) {
-                        case Fault fault -> {
-                            dialog.print(user, fault.getError());
-                        }
-                        case Movies movies -> {
-                            Queue<Film> films = movies.getFilms();
-                            StringBuilder result = new StringBuilder();
-                            if (!command.equals("случайный")) {
-                                if (films.isEmpty()) {
-                                    dialog.print(user, "Не нашлось фильмов с такими характеристиками");
-                                } else {
-                                    command = "еще";
-                                    while (command.equals("еще")) {
-                                        if (films.isEmpty()) {
-                                            dialog.print(user, "Фильмы кончились");
-                                            break;
-                                        }
-                                        result.append(films.remove());
-                                        result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
-                                        dialog.print(user, result.toString());
-                                        command = dialog.takeArg(user).getMessage();
-                                        result = new StringBuilder();
-                                    }
-                                    dialog.print(user, "Жду дальнейших команд");
-                                }
-                            } else {
-                                dialog.print(user, films.remove().toString());
-                            }
-                        }
-                        default -> dialog.print(user, "Неизвестная ошибка");
-                    }
+                else {
+                    printFilms(user,"еще");
                 }
             }
-            if (!isRunning) {
-                continue;
+            default -> dialog.print(user, "Неизвестная ошибка");
+        }
+    }
+    private void printFilms(User user, String command){
+        Queue<Film> films = user.getFilms();
+        if (!user.getApiRequest().get("request").equals("случайный")) {
+            if (films.isEmpty()) {
+                dialog.print(user, "Фильмы кончились");
             }
-            command = dialog.takeArg(user).getMessage();
+            if (command.equals("еще")) {
+                dialog.print(user,films.remove().toString() +
+                        "Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
+            }
+            else {
+                dialog.print(user, "Жду дальнейших команд");
+                user.cleanMap();
+            }
+        }
+        else {
+            dialog.print(user, films.remove().toString());
         }
     }
 }

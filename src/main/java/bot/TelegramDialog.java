@@ -17,6 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
     private String BOT_TOKEN;
     private String BOT_USERNAME;
+    private LogicDialog logicDialog = new LogicDialog(new ApiFilm(),this);
     {
         BufferedReader tgReader;
         try {
@@ -30,42 +31,37 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             throw new RuntimeException(e);
         }
     }
-    private final Map<Long, BlockingQueue<UserMessage>> userMessageQueues = new HashMap<>();
-    private final Map<Long, LogicDialog> userDialogs = new HashMap<>(); // Хранит активные диалоги пользователей
+    private final Map<User, String> userDialogs = new HashMap<>(); // Хранит активные диалоги пользователей
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText().toLowerCase();
             Long userId = update.getMessage().getChatId();
             deleteUserDialog();
-            if (userDialogs.containsKey(userId)){
-                userMessageQueues.get(userId).offer(new UserMessage(new User(userId), messageText));
+            User user = null;
+            boolean userIsRun = false;
+            for (User key : userDialogs.keySet()){
+                if (userId == key.getUserID()){
+                    user = key;
+                    userIsRun = true;
+                    break;
+                }
             }
-            else{
-                LogicDialog logicDialog = new LogicDialog(new ApiFilm(), this);
-                BlockingQueue<UserMessage> userBlockingQueue = new LinkedBlockingQueue<>();
-                userBlockingQueue.offer(new UserMessage(new User(userId), messageText));
-                userMessageQueues.put(userId, userBlockingQueue);
-                userDialogs.put(userId,logicDialog);
-                new Thread(() -> logicDialog.startDialog(new User(userId))).start();
+            if (!userIsRun){
+                user = new User(userId);
+                print(user, "Привет! Я фильм бот.");
             }
+            String state = logicDialog.makeState(user,messageText);
+            userDialogs.put(user,state);
+            logicDialog.statusProcessing(user,state,messageText);
         }
     }
     private void deleteUserDialog(){
-        for (Long key : userDialogs.keySet()) {
-            LogicDialog logicDialog = userDialogs.get(key);
-            if (!logicDialog.getIsRunning()){
+        for (User key : userDialogs.keySet()) {
+            String state = userDialogs.get(key);
+            if (state.equals("end")){
                 userDialogs.remove(key);
-                userMessageQueues.remove(key);
             }
-        }
-    }
-    public UserMessage takeArg(User user) {
-        BlockingQueue<UserMessage> queue = userMessageQueues.get(user.getUserID());
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
     public void print(User user,String text){

@@ -7,9 +7,4 @@ public class UserMessage {
         this.message = message;
         this.user = user;
     }
-    public User getUser(){return user;}
-
-    public String getMessage() {
-        return message;
-    }
 }
