@@ -31,39 +31,37 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             throw new RuntimeException(e);
         }
     }
-    private final Map<User, String> userDialogs = new HashMap<>(); // Хранит активные диалоги пользователей
+    private final Map<Long, UserData> userDialogs = new HashMap<>(); // Хранит активные диалоги пользователей
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText().toLowerCase();
             Long userId = update.getMessage().getChatId();
             deleteUserDialog();
-            User user = null;
-            boolean userIsRun = false;
-            for (User key : userDialogs.keySet()){
-                if (userId == key.getUserID()){
-                    user = key;
-                    userIsRun = true;
-                    break;
-                }
+            UserData userData;
+            if (userDialogs.containsKey(userId)){
+                userData = userDialogs.get(userId);
             }
-            if (!userIsRun){
-                user = new User(userId);
-                print(user, "Привет! Я фильм бот.");
+            else{
+                userData = new UserData();
+                userData.setUser(new User(userId));
+                print(userData.getUser(), "Привет! Я фильм бот.");
             }
-            String state = logicDialog.makeState(user,messageText);
-            userDialogs.put(user,state);
-            logicDialog.statusProcessing(user,state,messageText);
+            UserState state = logicDialog.makeState(userData.getUser(),messageText);
+            userData.setState(state);
+            userDialogs.put(userId,userData);
+            logicDialog.statusProcessing(userData.getUser(),state,messageText);
         }
     }
     private void deleteUserDialog(){
-        for (User key : userDialogs.keySet()) {
-            String state = userDialogs.get(key);
-            if (state.equals("end")){
+        for (Long key : userDialogs.keySet()) {
+            UserState state = userDialogs.get(key).getState();
+            if (state.equals(UserState.end)){
                 userDialogs.remove(key);
             }
         }
     }
+    @Override
     public void print(User user,String text){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getUserID()));

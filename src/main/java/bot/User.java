@@ -21,8 +21,7 @@ public class User {
         return apiRequest;
     }
     public void cleanMap(){
-        apiRequest.remove("characteristicType");
-        apiRequest.remove("request");
+        apiRequest.clear();
     }
 
     public void setApiRequest(String key,String value) {

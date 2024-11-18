@@ -12,44 +12,44 @@ public class LogicDialog {
         this.apiFilm = apiFilm;
         this.dialog = dialog;
     }
-    public void statusProcessing(User user, String state, String command){
+    public void statusProcessing(User user, UserState state, String command){
         switch (state) {
-            case ("characteristicType"):
+            case characteristicType:
                 characteristicType(user,command);
                 break;
-            case ("getGenre"):
+            case getGenre:
                 getGenre(user);
                 break;
-            case ("baseCommand"), "end":
+            case baseCommand, end:
                 baseCommand(user,command);
                 break;
-            case ("request"):
+            case request:
                 requestToApi(user);
                 break;
-            case ("getFilms"):
+            case getFilms:
                 printFilms(user,command);
                 break;
         }
     }
-    public String makeState(User user,String command) {
+    public UserState makeState(User user,String command) {
         if (TypeOfFilmRequest.commandToEnum(command) != null) {
             user.setApiRequest("characteristicType",command);
-            return "characteristicType";
+            return UserState.characteristicType;
         }
         if ("список".equals(command)) {
-            return "getGenre";
+            return UserState.getGenre;
         }
         if (user.getApiRequest().containsKey("characteristicType")) {
             user.setApiRequest("request", command);
-            return "request";
+            return UserState.request;
         }
         if (command.equals("еще") || command.equals("хватит")) {
-            return "getFilms";
+            return UserState.getFilms;
         }
         if (command.equals("стоп")){
-            return "end";
+            return UserState.end;
         }
-        return "baseCommand";
+        return UserState.baseCommand;
     }
     private void baseCommand(User user, String command) {
         if (!commandStorage.isCommand(command)) {

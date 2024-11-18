@@ -9,12 +9,13 @@ public class ConsoleDialog implements Dialog {
         LogicDialog logicDialog = new LogicDialog(new ApiFilm(),this);
         print(user, "Привет! Я фильм бот.");
         while (!command.equals("стоп")){
-            String state = logicDialog.makeState(user,command);;
+            UserState state = logicDialog.makeState(user,command);;
             logicDialog.statusProcessing(user,state,command);
             command = scanner.nextLine();
             command = command.toLowerCase();
         }
     }
+    @Override
     public void print(User user, String command) {
         System.out.println(command);
     }
