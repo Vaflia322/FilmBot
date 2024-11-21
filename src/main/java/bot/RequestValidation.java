@@ -1,26 +1,26 @@
 package bot;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Set;
 
 public class RequestValidation {
     CommandStorage commandStorage = new CommandStorage();
     Set<String> genres = commandStorage.getGenres();
     Pattern patternName = Pattern.compile(
-            "[" +
-                    "а-яА-ЯёЁ" +
-                    "\\d" +
-                    "\\s" +
-                    "\\p{Punct}" +
-                    "]" +
-                    "*");
+            "["
+                    + "а-яА-ЯёЁ"
+                    + "\\d"
+                    + "\\s"
+                    + "\\p{Punct}"
+                    + "]"
+                    + "*");
     Pattern patternNumber = Pattern.compile(
-            "[" +
-                    "\\d" +
-                    "\\p{Punct}" +
-                    "]" +
-                    "*");
+            "["
+                    + "\\d"
+                    + "\\p{Punct}"
+                    + "]"
+                    + "*");
 
     public boolean isGenreExists(String genreAuth) {
         return (genres.contains(genreAuth));

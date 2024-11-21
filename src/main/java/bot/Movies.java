@@ -1,6 +1,7 @@
 package bot;
 
-import java.util.*;
+import java.util.Queue;
+import java.util.ArrayDeque;
 
 public final class Movies extends ApiObject {
     private final Queue<Film> films = new ArrayDeque<>();
