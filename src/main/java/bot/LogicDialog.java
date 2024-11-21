@@ -21,15 +21,17 @@ public class LogicDialog {
             case getGenre:
                 getGenre(user);
                 break;
-            case baseCommand, end:
-                baseCommand(user, command);
-                break;
             case request:
                 requestToApi(user);
                 break;
             case getFilms:
                 printFilms(user, command);
                 break;
+            default:
+                baseCommand(user, command);
+                break;
+
+
         }
     }
 
@@ -105,8 +107,9 @@ public class LogicDialog {
                 dialog.print(user, "Фильмы кончились");
             }
             if (command.equals("еще")) {
-                dialog.print(user, films.remove().toString() +
-                        "Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
+                dialog.print(user, films.remove().toString()
+                        + "Если вы хотите получить еще один фильм"
+                        + " с такой характеристикой введите еще иначе введите хватит");
             } else {
                 dialog.print(user, "Жду дальнейших команд");
                 user.cleanMap();
