@@ -1,4 +1,5 @@
 package bot;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
@@ -20,6 +21,7 @@ public class RequestValidation {
                     "\\p{Punct}" +
                     "]" +
                     "*");
+
     public boolean isGenreExists(String genreAuth) {
         return (genres.contains(genreAuth));
     }
@@ -28,7 +30,8 @@ public class RequestValidation {
         Matcher matcher = patternName.matcher(name);
         return matcher.matches();
     }
-    public boolean isRatingExists(String number){
+
+    public boolean isRatingExists(String number) {
         Matcher matcher = patternNumber.matcher(number);
         String checkNumber = "";
         double doubleNumber;
@@ -53,6 +56,7 @@ public class RequestValidation {
         }
         return matcher.matches();
     }
+
     public boolean isYearExists(String number) {
         Matcher matcher = patternNumber.matcher(number);
         String checkNumber = "";

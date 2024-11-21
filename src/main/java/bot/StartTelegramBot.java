@@ -8,9 +8,9 @@ public class StartTelegramBot {
     public void startBot() {
         TelegramBotsApi telegramBotsApi;
         try {
-            telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class) ;
+            telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             telegramBotsApi.registerBot(new TelegramDialog());
-        }catch(TelegramApiException e){
+        } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }

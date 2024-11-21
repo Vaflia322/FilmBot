@@ -14,13 +14,14 @@ public enum TypeOfFilmRequest {
         this.russianName = russianName;
     }
 
-    public static TypeOfFilmRequest commandToEnum(String command){
+    public static TypeOfFilmRequest commandToEnum(String command) {
         return Arrays.stream(TypeOfFilmRequest.values())
                 .filter(type -> type.getRussianName().equalsIgnoreCase(command))
                 .findFirst()
                 .orElse(null);
     }
-    private String getRussianName(){
+
+    private String getRussianName() {
         return russianName;
     }
 }

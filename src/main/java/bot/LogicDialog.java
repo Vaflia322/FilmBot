@@ -12,28 +12,30 @@ public class LogicDialog {
         this.apiFilm = apiFilm;
         this.dialog = dialog;
     }
-    public void statusProcessing(User user, UserState state, String command){
+
+    public void statusProcessing(User user, UserState state, String command) {
         switch (state) {
             case characteristicType:
-                characteristicType(user,command);
+                characteristicType(user, command);
                 break;
             case getGenre:
                 getGenre(user);
                 break;
             case baseCommand, end:
-                baseCommand(user,command);
+                baseCommand(user, command);
                 break;
             case request:
                 requestToApi(user);
                 break;
             case getFilms:
-                printFilms(user,command);
+                printFilms(user, command);
                 break;
         }
     }
-    public UserState makeState(User user,String command) {
+
+    public UserState makeState(User user, String command) {
         if (TypeOfFilmRequest.commandToEnum(command) != null) {
-            user.setApiRequest("characteristicType",command);
+            user.setApiRequest("characteristicType", command);
             return UserState.characteristicType;
         }
         if ("список".equals(command)) {
@@ -46,11 +48,12 @@ public class LogicDialog {
         if (command.equals("еще") || command.equals("хватит")) {
             return UserState.getFilms;
         }
-        if (command.equals("стоп")){
+        if (command.equals("стоп")) {
             return UserState.end;
         }
         return UserState.baseCommand;
     }
+
     private void baseCommand(User user, String command) {
         if (!commandStorage.isCommand(command)) {
             dialog.print(user, commandStorage.parsingSupportedCommand("-help"));
@@ -62,14 +65,17 @@ public class LogicDialog {
             dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
         }
     }
-    private void getGenre (User user){
+
+    private void getGenre(User user) {
         Set<String> genres = commandStorage.getGenres();
         String stringGenres = String.join(", ", genres);
         dialog.print(user, stringGenres);
     }
+
     private void characteristicType(User user, String command) {
         dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
     }
+
     private void requestToApi(User user) {
         String command = user.getApiRequest().get("characteristicType");
         String tellFilmCommand = user.getApiRequest().get("request");
@@ -84,30 +90,28 @@ public class LogicDialog {
                 user.setFilms(films);
                 if (films.isEmpty()) {
                     dialog.print(user, "Не нашлось фильмов с такими характеристиками");
-                }
-                else {
-                    printFilms(user,"еще");
+                } else {
+                    printFilms(user, "еще");
                 }
             }
             default -> dialog.print(user, "Неизвестная ошибка");
         }
     }
-    private void printFilms(User user, String command){
+
+    private void printFilms(User user, String command) {
         Queue<Film> films = user.getFilms();
         if (!user.getApiRequest().get("request").equals("случайный")) {
             if (films.isEmpty()) {
                 dialog.print(user, "Фильмы кончились");
             }
             if (command.equals("еще")) {
-                dialog.print(user,films.remove().toString() +
+                dialog.print(user, films.remove().toString() +
                         "Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
-            }
-            else {
+            } else {
                 dialog.print(user, "Жду дальнейших команд");
                 user.cleanMap();
             }
-        }
-        else {
+        } else {
             dialog.print(user, films.remove().toString());
         }
     }

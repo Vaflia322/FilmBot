@@ -1,10 +1,12 @@
 package bot;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RequestValidationTest {
     private final RequestValidation requestValidation = new RequestValidation();
+
     @Test
     void genreValidation() {
         boolean result = requestValidation.isGenreExists("драма");
@@ -28,6 +30,7 @@ class RequestValidationTest {
         boolean result = requestValidation.isYearExists("2020-2021");
         assertTrue(result);
     }
+
     @Test
     void genreValidationFailed() {
         boolean result = requestValidation.isGenreExists("любой");

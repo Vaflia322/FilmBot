@@ -1,4 +1,5 @@
 package bot;
+
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -17,7 +18,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
     private String BOT_TOKEN;
     private String BOT_USERNAME;
-    private LogicDialog logicDialog = new LogicDialog(new ApiFilm(),this);
+    private LogicDialog logicDialog = new LogicDialog(new ApiFilm(), this);
+
     {
         BufferedReader tgReader;
         try {
@@ -31,7 +33,9 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             throw new RuntimeException(e);
         }
     }
+
     private final Map<Long, UserData> userDialogs = new HashMap<>(); // Хранит активные диалоги пользователей
+
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -39,30 +43,31 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             Long userId = update.getMessage().getChatId();
             deleteUserDialog();
             UserData userData;
-            if (userDialogs.containsKey(userId)){
+            if (userDialogs.containsKey(userId)) {
                 userData = userDialogs.get(userId);
-            }
-            else{
+            } else {
                 userData = new UserData();
                 userData.setUser(new User(userId));
                 print(userData.getUser(), "Привет! Я фильм бот.");
             }
-            UserState state = logicDialog.makeState(userData.getUser(),messageText);
+            UserState state = logicDialog.makeState(userData.getUser(), messageText);
             userData.setState(state);
-            userDialogs.put(userId,userData);
-            logicDialog.statusProcessing(userData.getUser(),state,messageText);
+            userDialogs.put(userId, userData);
+            logicDialog.statusProcessing(userData.getUser(), state, messageText);
         }
     }
-    private void deleteUserDialog(){
+
+    private void deleteUserDialog() {
         for (Long key : userDialogs.keySet()) {
             UserState state = userDialogs.get(key).getState();
-            if (state.equals(UserState.end)){
+            if (state.equals(UserState.end)) {
                 userDialogs.remove(key);
             }
         }
     }
+
     @Override
-    public void print(User user,String text){
+    public void print(User user, String text) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(user.getUserID()));
         sendMessage.setText(text);

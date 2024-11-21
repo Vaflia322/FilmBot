@@ -6,9 +6,10 @@ import java.util.Queue;
 
 public class User {
     private final long userID;
-    private final Map<String,String> apiRequest;
+    private final Map<String, String> apiRequest;
     private Queue<Film> films;
-    public User(long userID){
+
+    public User(long userID) {
         this.userID = userID;
         apiRequest = new HashMap<>();
     }
@@ -20,14 +21,16 @@ public class User {
     public Map<String, String> getApiRequest() {
         return apiRequest;
     }
-    public void cleanMap(){
+
+    public void cleanMap() {
         apiRequest.clear();
     }
 
-    public void setApiRequest(String key,String value) {
-        apiRequest.put(key,value);
+    public void setApiRequest(String key, String value) {
+        apiRequest.put(key, value);
     }
-    public Queue<Film> getFilms(){
+
+    public Queue<Film> getFilms() {
         return films;
     }
 
