@@ -66,13 +66,14 @@ public class ApiFilm {
             case RATING:
                 if (!requestValidation.isRatingExists(request)) {
                     return new Fault("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\n"
-                            +"Также можете указать диапазон,например 7.3-9");
+                            + "Также можете указать диапазон,например 7.3-9");
                 }
                 urlRequest.append("?rating.kp=");
                 break;
             case YEAR:
                 if (!requestValidation.isYearExists(request)) {
-                    return new Fault("Вы ввели некорректный год, введите год, либо диапазон, напрмер 2018,2020-2023");
+                    return new Fault("Вы ввели некорректный год, введите год, либо диапазон, "
+                            + "напрмер 2018,2020-2023");
                 }
                 urlRequest.append("?year=");
                 break;
