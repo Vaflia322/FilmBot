@@ -24,9 +24,6 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             tgReader = new BufferedReader(new FileReader("tg.txt"));
             BOT_TOKEN = tgReader.readLine();
             BOT_USERNAME = tgReader.readLine();
-        } catch (
-                FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
