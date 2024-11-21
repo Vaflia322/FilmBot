@@ -17,6 +17,8 @@ public class Main {
             case ("-telegram"):
                 startTelegramBot.startBot();
                 break;
+            default:
+                throw new RuntimeException("Некорректные аргменуты");
         }
     }
 }
