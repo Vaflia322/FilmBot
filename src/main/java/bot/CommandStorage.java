@@ -33,8 +33,8 @@ public class CommandStorage {
     }
 
     private final Set<String> supportedCommand = new HashSet<>(Set.of("-help", "подскажи фильм", "стоп"));
-    private final Set<String> supportedFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг"
-            , "случайный"));
+    private final Set<String> supportedFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг",
+            "случайный"));
 
     public boolean isCommand(String command) {
         return isSupportedCommand(command) || isSupportedFilmsCommand(command);
