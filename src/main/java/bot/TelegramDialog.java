@@ -39,7 +39,6 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText().toLowerCase();
             Long userId = update.getMessage().getChatId();
-            deleteUserDialog();
             UserData userData;
             if (userDialogs.containsKey(userId)) {
                 userData = userDialogs.get(userId);
@@ -52,17 +51,12 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             userData.setState(state);
             userDialogs.put(userId, userData);
             logicDialog.statusProcessing(userData.getUser(), state, messageText);
-        }
-    }
-
-    private void deleteUserDialog() {
-        for (Long key : userDialogs.keySet()) {
-            UserState state = userDialogs.get(key).getState();
-            if (state.equals(UserState.end)) {
-                userDialogs.remove(key);
+            if (userDialogs.get(userId).getState().equals(UserState.end)) {
+                userDialogs.remove(userId);
             }
         }
     }
+
 
     @Override
     public void print(User user, String text) {

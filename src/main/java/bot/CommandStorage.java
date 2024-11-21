@@ -33,7 +33,8 @@ public class CommandStorage {
     }
 
     private final Set<String> supportedCommand = new HashSet<>(Set.of("-help", "подскажи фильм", "стоп"));
-    private final Set<String> supportedFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг", "случайный"));
+    private final Set<String> supportedFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг"
+            , "случайный"));
 
     public boolean isCommand(String command) {
         return isSupportedCommand(command) || isSupportedFilmsCommand(command);
@@ -50,8 +51,8 @@ public class CommandStorage {
     public String parsingSupportedCommand(String command) {
         switch (command) {
             case ("-help"):
-                return "Для получения справки введите -help, если вам нужно подсказать фильм введите подскажи фильм\n" +
-                        "Чтобы прекратить работу бота введите стоп";
+                return "Для получения справки введите -help, если вам нужно подсказать фильм введите подскажи фильм\n"
+                        + "Чтобы прекратить работу бота введите стоп";
             case ("подскажи фильм"):
                 return "Я могу подсказать фильм по названию, жанру, рейтингу, году или же выдать случайный фильм\n" +
                         "Для того чтобы я мог это сделать введите слова название, жанр, рейтинг, год или же случайный";

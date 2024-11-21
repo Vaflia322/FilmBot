@@ -65,7 +65,8 @@ public class ApiFilm {
                 break;
             case RATING:
                 if (!requestValidation.isRatingExists(request)) {
-                    return new Fault("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\nТакже можете указать диапазон,например 7.3-9");
+                    return new Fault("Вы ввели некорректный рейтинг, введите рейтинг от 1 до 10\n"
+                            +"Также можете указать диапазон,например 7.3-9");
                 }
                 urlRequest.append("?rating.kp=");
                 break;
