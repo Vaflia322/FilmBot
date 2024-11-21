@@ -12,8 +12,8 @@ class CommandStorageTest {
     void commandHelpResultEquals() {
         String result = commandStorage.parsingSupportedCommand("-help");
         ;
-        assertEquals("Для получения справки введите -help, если вам нужно подсказать фильм введите подскажи фильм\n" +
-                "Чтобы прекратить работу бота введите стоп", result);
+        assertEquals("Для получения справки введите -help, если вам нужно подсказать фильм введите" +
+                "+ подскажи фильм\nЧтобы прекратить работу бота введите стоп", result);
     }
 
     @Test

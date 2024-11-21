@@ -1,11 +1,11 @@
 package bot;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Set;
-import java.io.BufferedReader;
 import java.util.HashSet;
+import java.util.Set;
 
 public class CommandStorage {
     private final Set<String> genres = new HashSet<>();

@@ -36,7 +36,8 @@ class LogicDialogTest {
         User user = new User(1);
         user.setApiRequest("characteristicType", "жанр");
         user.setApiRequest("request", "любой");
-        when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE, "любой")).thenReturn(new Fault("Вы ввели некорректный жанр"));
+        when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE, "любой"))
+                .thenReturn(new Fault("Вы ввели некорректный жанр"));
         LogicDialog logicDialog = new LogicDialog(apiFilmMock, dialogMock);
         logicDialog.statusProcessing(user, UserState.request, "любой");
         verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE, "любой");
