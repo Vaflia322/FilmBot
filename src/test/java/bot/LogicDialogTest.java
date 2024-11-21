@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.Queue;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 
 class LogicDialogTest {
     @Test
     public void apiGenreDramaTest() {
-        ApiFilm apiFilmMock = mock(ApiFilm.class);
-        Dialog dialogMock = mock(Dialog.class);
+        final ApiFilm apiFilmMock = mock(ApiFilm.class);
+        final Dialog dialogMock = mock(Dialog.class);
         User user = new User(1);
         user.setApiRequest("characteristicType", "жанр");
         user.setApiRequest("request", "драма");
