@@ -6,7 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,16 +13,16 @@ import java.util.Map;
 
 
 public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
-    private String BOT_TOKEN;
-    private String BOT_USERNAME;
+    private String botToken;
+    private String botUsername;
     private LogicDialog logicDialog = new LogicDialog(new ApiFilm(), this);
 
     {
         BufferedReader tgReader;
         try {
             tgReader = new BufferedReader(new FileReader("tg.txt"));
-            BOT_TOKEN = tgReader.readLine();
-            BOT_USERNAME = tgReader.readLine();
+            botToken = tgReader.readLine();
+            botUsername = tgReader.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -70,11 +69,11 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
 
     @Override
     public String getBotUsername() {
-        return BOT_USERNAME;
+        return botUsername;
     }
 
     @Override
     public String getBotToken() {
-        return BOT_TOKEN;
+        return botToken;
     }
 }
