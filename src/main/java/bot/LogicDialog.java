@@ -6,88 +6,117 @@ import java.util.Set;
 public class LogicDialog {
     private final ApiFilm apiFilm;
     private final Dialog dialog;
+    private final CommandStorage commandStorage = new CommandStorage();
+
     public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
         this.apiFilm = apiFilm;
         this.dialog = dialog;
-
     }
 
-    private boolean exit(String command) {
-        return !command.equals("стоп");
-    }
-    public void startDialog(String command) {
+    public void statusProcessing(User user, UserState state, String command) {
+        switch (state) {
+            case CHARACTERISTIC_TYPE:
+                characteristicType(user, command);
+                break;
+            case GET_GENRE:
+                getGenre(user);
+                break;
+            case REQUEST:
+                requestToApi(user);
+                break;
+            case GET_FILMS:
+                printFilms(user, command);
+                break;
+            default:
+                baseCommand(user, command);
+                break;
 
-        CommandStorage commandStorage = new CommandStorage();
-        dialog.print("Привет! Я фильм бот.");
-        boolean isRunning = true;
-        while (isRunning) {
-            if (!commandStorage.isCommand(command)) {
-                dialog.print(commandStorage.parsingSupportedCommand("-help"));
-                command = dialog.takeArg();
-                continue;
+
+        }
+    }
+
+    public UserState makeState(User user, String command) {
+        if (TypeOfFilmRequest.commandToEnum(command) != null) {
+            user.setApiRequest("characteristicType", command);
+            return UserState.CHARACTERISTIC_TYPE;
+        }
+        if ("список".equals(command)) {
+            return UserState.GET_GENRE;
+        }
+        if (user.getApiRequest().containsKey("characteristicType")) {
+            user.setApiRequest("request", command);
+            return UserState.REQUEST;
+        }
+        if (command.equals("еще") || command.equals("хватит")) {
+            return UserState.GET_FILMS;
+        }
+        if (command.equals("стоп")) {
+            return UserState.END;
+        }
+        return UserState.BASE_COMMAND;
+    }
+
+    private void baseCommand(User user, String command) {
+        if (!commandStorage.isCommand(command)) {
+            dialog.print(user, commandStorage.parsingSupportedCommand("-help"));
+        }
+        if (commandStorage.isSupportedCommand(command)) {
+            dialog.print(user, commandStorage.parsingSupportedCommand(command));
+        }
+        if (commandStorage.isSupportedFilmsCommand(command)) {
+            dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
+        }
+    }
+
+    private void getGenre(User user) {
+        Set<String> genres = commandStorage.getGenres();
+        String stringGenres = String.join(", ", genres);
+        dialog.print(user, stringGenres);
+    }
+
+    private void characteristicType(User user, String command) {
+        dialog.print(user, commandStorage.parsingSupportedFilmsCommand(command));
+    }
+
+    private void requestToApi(User user) {
+        String command = user.getApiRequest().get("characteristicType");
+        String tellFilmCommand = user.getApiRequest().get("request");
+        user.getApiRequest().remove("characteristicType");
+        ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
+        switch (response) {
+            case Fault fault -> {
+                dialog.print(user, fault.getError());
             }
-            if (commandStorage.isSupportedCommand(command)) {
-                dialog.print(commandStorage.parsingSupportedCommand(command));
-                isRunning = exit(command);
-            }
-            if (commandStorage.isSupportedFilmsCommand(command)) {
-                dialog.print(commandStorage.parsingSupportedFilmsCommand(command));
-                String tellFilmCommand;
-                if (!command.contains("случайный")) {
-                    tellFilmCommand = dialog.takeArg();
-                    if (tellFilmCommand.contains("список")) {
-                        Set<String> genres = commandStorage.getGenres();
-                        String stringGenres = String.join(", ", genres);
-                        dialog.print(stringGenres);
-                        tellFilmCommand = dialog.takeArg();
-                    }
+            case Movies movies -> {
+                Queue<Film> films = movies.getFilms();
+                user.setFilms(films);
+                if (films.isEmpty()) {
+                    dialog.print(user, "Не нашлось фильмов с такими характеристиками");
                 } else {
-                    tellFilmCommand = "случайный";
-                }
-                if (tellFilmCommand.equals("стоп") || tellFilmCommand.equals("-help")) {
-                    dialog.print(commandStorage.parsingSupportedCommand(tellFilmCommand));
-                    isRunning = exit(tellFilmCommand);
-                } else {
-                    ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
-                    switch (response) {
-                        case Fault fault -> {
-                            dialog.print(fault.getError());
-                        }
-                        case Movies movies -> {
-                            Queue<Film> films = movies.getFilms();
-                            StringBuilder result = new StringBuilder();
-                            if (!command.equals("случайный")) {
-                                if (films.isEmpty()) {
-                                    dialog.print("Не нашлось фильмов с такими характеристиками");
-                                } else {
-                                    command = "еще";
-                                    while (command.equals("еще")) {
-                                        if (films.isEmpty()) {
-                                            dialog.print("Фильмы кончились");
-                                            break;
-                                        }
-                                        result.append(films.remove());
-                                        result.append("Если вы хотите получить еще один фильм с такой характеристикой введите еще иначе введите хватит");
-                                        dialog.print(result.toString());
-                                        command = dialog.takeArg();
-                                        result = new StringBuilder();
-                                    }
-                                    dialog.print("Жду дальнейших команд");
-                                }
-                            } else {
-                                dialog.print(films.remove().toString());
-                            }
-                        }
-                        default -> dialog.print("Неизвестная ошибка");
-                    }
+                    printFilms(user, "еще");
                 }
             }
-            if (!isRunning) {
-                continue;
+            default -> dialog.print(user, "Неизвестная ошибка");
+        }
+    }
+
+    private void printFilms(User user, String command) {
+        Queue<Film> films = user.getFilms();
+        if (!user.getApiRequest().get("request").equals("случайный")) {
+            if (films.isEmpty()) {
+                dialog.print(user, "Фильмы кончились");
             }
-            command = dialog.takeArg();
+            if (command.equals("еще")) {
+                dialog.print(user, films.remove().toString()
+                        + "Если вы хотите получить еще один фильм"
+                        + " с такой характеристикой введите еще иначе введите хватит");
+            } else {
+                dialog.print(user, "Жду дальнейших команд");
+                user.cleanMap();
+            }
+        } else {
+            dialog.print(user, films.remove().toString());
         }
     }
 }
-
 
