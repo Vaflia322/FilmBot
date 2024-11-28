@@ -15,16 +15,16 @@ public class LogicDialog {
 
     public void statusProcessing(User user, UserState state, String command) {
         switch (state) {
-            case characteristicType:
+            case CHARACTERISTIC_TYPE:
                 characteristicType(user, command);
                 break;
-            case getGenre:
+            case GET_GENRE:
                 getGenre(user);
                 break;
-            case request:
+            case REQUEST:
                 requestToApi(user);
                 break;
-            case getFilms:
+            case GET_FILMS:
                 printFilms(user, command);
                 break;
             default:
@@ -38,22 +38,22 @@ public class LogicDialog {
     public UserState makeState(User user, String command) {
         if (TypeOfFilmRequest.commandToEnum(command) != null) {
             user.setApiRequest("characteristicType", command);
-            return UserState.characteristicType;
+            return UserState.CHARACTERISTIC_TYPE;
         }
         if ("список".equals(command)) {
-            return UserState.getGenre;
+            return UserState.GET_GENRE;
         }
         if (user.getApiRequest().containsKey("characteristicType")) {
             user.setApiRequest("request", command);
-            return UserState.request;
+            return UserState.REQUEST;
         }
         if (command.equals("еще") || command.equals("хватит")) {
-            return UserState.getFilms;
+            return UserState.GET_FILMS;
         }
         if (command.equals("стоп")) {
-            return UserState.end;
+            return UserState.END;
         }
-        return UserState.baseCommand;
+        return UserState.BASE_COMMAND;
     }
 
     private void baseCommand(User user, String command) {

@@ -24,7 +24,7 @@ class LogicDialogTest {
         movies.addFilm(new Film("НАЗВАНИЕ1", "ОПИСАНИЕ1", "РЕЙТИНГ1", List.of("драма")));
         when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE, "драма")).thenReturn(movies);
         LogicDialog logicDialog = new LogicDialog(apiFilmMock, dialogMock);
-        logicDialog.statusProcessing(user, UserState.request, "драма");
+        logicDialog.statusProcessing(user, UserState.REQUEST, "драма");
         Queue<Film> films = user.getFilms();
         Film film = films.remove();
         assertTrue(film.genres().contains("драма"));
@@ -41,7 +41,7 @@ class LogicDialogTest {
         when(apiFilmMock.takeFilms(TypeOfFilmRequest.GENRE, "любой"))
                 .thenReturn(new Fault("Вы ввели некорректный жанр"));
         LogicDialog logicDialog = new LogicDialog(apiFilmMock, dialogMock);
-        logicDialog.statusProcessing(user, UserState.request, "любой");
+        logicDialog.statusProcessing(user, UserState.REQUEST, "любой");
         verify(apiFilmMock).takeFilms(TypeOfFilmRequest.GENRE, "любой");
     }
 }

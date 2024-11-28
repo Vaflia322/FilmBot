@@ -47,7 +47,7 @@ public class TelegramDialog extends TelegramLongPollingBot implements Dialog {
             userData.setState(state);
             userDialogs.put(userId, userData);
             logicDialog.statusProcessing(userData.getUser(), state, messageText);
-            if (userDialogs.get(userId).getState().equals(UserState.end)) {
+            if (userDialogs.get(userId).getState().equals(UserState.END)) {
                 userDialogs.remove(userId);
             }
         }

@@ -13,7 +13,6 @@ public class ConsoleDialog implements Dialog {
         print(user, "Привет! Я фильм бот.");
         while (!command.equals("стоп")) {
             UserState state = logicDialog.makeState(user, command);
-            ;
             logicDialog.statusProcessing(user, state, command);
             command = scanner.nextLine();
             command = command.toLowerCase();

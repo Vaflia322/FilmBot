@@ -1,11 +1,11 @@
 package bot;
 
 public enum UserState {
-    characteristicType,
-    getGenre,
-    baseCommand,
-    end,
-    getFilms,
-    request,
+    CHARACTERISTIC_TYPE,
+    GET_GENRE,
+    BASE_COMMAND,
+    END,
+    GET_FILMS,
+    REQUEST,
 }
 
