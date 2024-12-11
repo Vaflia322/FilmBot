@@ -7,5 +7,11 @@ public enum UserState {
     END,
     GET_FILMS,
     REQUEST,
+    SHOW_BLACK_LIST,
+    SHOW_WISH_LIST,
+    SHOW_VIEWED_LIST,
+    ADD_BLACK_LIST,
+    ADD_WISH_LIST,
+    ADD_VIEWED_LIST
 }
 

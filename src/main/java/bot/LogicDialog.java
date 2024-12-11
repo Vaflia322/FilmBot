@@ -1,5 +1,6 @@
 package bot;
 
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -7,6 +8,7 @@ public class LogicDialog {
     private final ApiFilm apiFilm;
     private final Dialog dialog;
     private final CommandStorage commandStorage = new CommandStorage();
+    WorkWithDataBase workWithDataBase = new WorkWithDataBase();
 
     public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
         this.apiFilm = apiFilm;
@@ -15,6 +17,24 @@ public class LogicDialog {
 
     public void statusProcessing(User user, UserState state, String command) {
         switch (state) {
+            case SHOW_BLACK_LIST:
+                showList(user, "blacklist");
+                break;
+            case SHOW_WISH_LIST:
+                showList(user, "wishlist");
+                break;
+            case SHOW_VIEWED_LIST:
+                showList(user, "viewed");
+                break;
+            case ADD_VIEWED_LIST:
+                addViewedList(user, command);
+                break;
+            case ADD_WISH_LIST:
+                addWishList(user);
+                break;
+            case ADD_BLACK_LIST:
+                addBlackList(user);
+                break;
             case CHARACTERISTIC_TYPE:
                 characteristicType(user, command);
                 break;
@@ -35,10 +55,53 @@ public class LogicDialog {
         }
     }
 
+    public void showList(User user, String typeList) {
+        Map<String, Set<String>> data = workWithDataBase.getUserData(user.getUserID());
+        Set<String> list = data.get(typeList);
+        String stringList = String.join(",", list);
+        dialog.print(user, stringList);
+    }
+
+    public void addBlackList(User user) {
+        workWithDataBase.addFilmToBlackList(user.getLastFilm(), user.getUserID());
+        dialog.print(user, "\nФильм добавлен в черный список");
+    }
+
+    public void addWishList(User user) {
+        workWithDataBase.addFilmToWishList(user.getLastFilm(), user.getUserID());
+        dialog.print(user, "\nФильм добавлен в список желаемых");
+    }
+
+    public void addViewedList(User user, String film) {
+        workWithDataBase.addFilmToViewed(film, user.getUserID());
+        dialog.print(user, "\nФильм добавлен в список просмотренных");
+    }
+
     public UserState makeState(User user, String command) {
+        if (!workWithDataBase.checkUserExists(user.getUserID())) {
+            workWithDataBase.createUser(user.getUserID());
+        }
         if (TypeOfFilmRequest.commandToEnum(command) != null) {
             user.setApiRequest("characteristicType", command);
             return UserState.CHARACTERISTIC_TYPE;
+        }
+        if (command.equals("добавить в черный список") || command.equals("добавить в чёрный список")) {
+            return UserState.ADD_BLACK_LIST;
+        }
+        if (command.equals("добавить в желаемые к просмотру")) {
+            return UserState.ADD_WISH_LIST;
+        }
+        if (command.equals("добавить просмотренный")) {
+            return UserState.ADD_VIEWED_LIST;
+        }
+        if (command.equals("черный список")) {
+            return UserState.SHOW_BLACK_LIST;
+        }
+        if (command.equals("просмотренные")) {
+            return UserState.SHOW_VIEWED_LIST;
+        }
+        if (command.equals("желаемые к просмотру")) {
+            return UserState.SHOW_WISH_LIST;
         }
         if ("список".equals(command)) {
             return UserState.GET_GENRE;
@@ -102,14 +165,28 @@ public class LogicDialog {
 
     private void printFilms(User user, String command) {
         Queue<Film> films = user.getFilms();
+        Map<String, Set<String>> data = workWithDataBase.getUserData(user.getUserID());
+        Set<String> blacklist = data.get("blacklist");
         if (!user.getApiRequest().get("request").equals("случайный")) {
             if (films.isEmpty()) {
                 dialog.print(user, "Фильмы кончились");
             }
             if (command.equals("еще")) {
-                dialog.print(user, films.remove().toString()
-                        + "Если вы хотите получить еще один фильм"
-                        + " с такой характеристикой введите еще иначе введите хватит");
+                Film film = films.remove();
+                if (blacklist.contains(film.name())) {
+                    while (blacklist.contains(film.name())) {
+                        film = films.remove();
+                    }
+                }
+                user.setLastFilm(film);
+                dialog.print(user, film
+                        + "\nЕсли вы хотите получить еще один фильм"
+                        + " с такой характеристикой введите еще"
+                        + "\n\nЕсли вы хотите добавить фильм в желаемые к просмотру"
+                        + " введите добавить в желаемые к просмотру"
+                        + "\n\nЕсли вы хотите добавить фильм в черный список"
+                        + " введите добавить в черный список"
+                        + " иначе введите хватит");
             } else {
                 dialog.print(user, "Жду дальнейших команд");
                 user.cleanMap();
