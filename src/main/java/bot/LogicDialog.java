@@ -1,5 +1,6 @@
 package bot;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class LogicDialog {
     public void showList(User user, String typeList) {
         Map<String, Set<String>> data = workWithDataBase.getUserData(user.getUserID());
         Set<String> list = data.get(typeList);
-        String stringList = String.join(",", list);
+        String stringList = String.join(", ", list);
         dialog.print(user, stringList);
     }
 
@@ -73,6 +74,7 @@ public class LogicDialog {
     }
 
     public void addViewedList(User user, String film) {
+        film = film.replace("добавить просмотренный ","");
         workWithDataBase.addFilmToViewed(film, user.getUserID());
         dialog.print(user, "\nФильм добавлен в список просмотренных");
     }
@@ -91,7 +93,7 @@ public class LogicDialog {
         if (command.equals("добавить в желаемые к просмотру")) {
             return UserState.ADD_WISH_LIST;
         }
-        if (command.equals("добавить просмотренный")) {
+        if (command.contains("добавить просмотренный")) {
             return UserState.ADD_VIEWED_LIST;
         }
         if (command.equals("черный список")) {
