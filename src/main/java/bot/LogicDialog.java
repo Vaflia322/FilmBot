@@ -1,6 +1,5 @@
 package bot;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -9,7 +8,7 @@ public class LogicDialog {
     private final ApiFilm apiFilm;
     private final Dialog dialog;
     private final CommandStorage commandStorage = new CommandStorage();
-    WorkWithDataBase workWithDataBase = new WorkWithDataBase();
+    UsersDataBaseQueries usersDataBaseQueries = new UsersDataBaseQueries();
 
     public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
         this.apiFilm = apiFilm;
@@ -57,31 +56,31 @@ public class LogicDialog {
     }
 
     public void showList(User user, String typeList) {
-        Map<String, Set<String>> data = workWithDataBase.getUserData(user.getUserID());
+        Map<String, Set<String>> data = usersDataBaseQueries.getUserData(user.getUserID());
         Set<String> list = data.get(typeList);
         String stringList = String.join(", ", list);
         dialog.print(user, stringList);
     }
 
     public void addBlackList(User user) {
-        workWithDataBase.addFilmToBlackList(user.getLastFilm(), user.getUserID());
+        usersDataBaseQueries.addFilmToBlackList(user.getLastFilm(), user.getUserID());
         dialog.print(user, "\nФильм добавлен в черный список");
     }
 
     public void addWishList(User user) {
-        workWithDataBase.addFilmToWishList(user.getLastFilm(), user.getUserID());
+        usersDataBaseQueries.addFilmToWishList(user.getLastFilm(), user.getUserID());
         dialog.print(user, "\nФильм добавлен в список желаемых");
     }
 
     public void addViewedList(User user, String film) {
         film = film.replace("добавить просмотренный ","");
-        workWithDataBase.addFilmToViewed(film, user.getUserID());
+        usersDataBaseQueries.addFilmToViewed(film, user.getUserID());
         dialog.print(user, "\nФильм добавлен в список просмотренных");
     }
 
     public UserState makeState(User user, String command) {
-        if (!workWithDataBase.checkUserExists(user.getUserID())) {
-            workWithDataBase.createUser(user.getUserID());
+        if (!usersDataBaseQueries.checkUserExists(user.getUserID())) {
+            usersDataBaseQueries.createUser(user.getUserID());
         }
         if (TypeOfFilmRequest.commandToEnum(command) != null) {
             user.setApiRequest("characteristicType", command);
@@ -147,7 +146,11 @@ public class LogicDialog {
         String command = user.getApiRequest().get("characteristicType");
         String tellFilmCommand = user.getApiRequest().get("request");
         user.getApiRequest().remove("characteristicType");
-        ApiObject response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
+        FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
+        ApiObject response = filmsDataBaseQueries.getFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
+        if (response == null){
+            response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
+        }
         switch (response) {
             case Fault fault -> {
                 dialog.print(user, fault.getError());
@@ -167,7 +170,7 @@ public class LogicDialog {
 
     private void printFilms(User user, String command) {
         Queue<Film> films = user.getFilms();
-        Map<String, Set<String>> data = workWithDataBase.getUserData(user.getUserID());
+        Map<String, Set<String>> data = usersDataBaseQueries.getUserData(user.getUserID());
         Set<String> blacklist = data.get("blacklist");
         if (!user.getApiRequest().get("request").equals("случайный")) {
             if (films.isEmpty()) {

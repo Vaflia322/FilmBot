@@ -33,6 +33,4 @@ api-key.txt
 build
 *.jar
 tg.txt
-url.txt
-user.txt
-password.txt
+base.txt

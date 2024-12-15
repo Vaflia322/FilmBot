@@ -3,7 +3,7 @@ package bot;
 import java.sql.*;
 import java.util.*;
 
-public class WorkWithDataBase {
+public class UsersDataBaseQueries {
     DataBaseConnection dataBaseConnection = new DataBaseConnection();
 
     public void createUser(long userID) {

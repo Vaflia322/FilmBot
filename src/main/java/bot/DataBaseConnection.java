@@ -14,12 +14,10 @@ public class DataBaseConnection {
 
     {
         try {
-            BufferedReader URLReader = new BufferedReader(new FileReader("url.txt"));
-            URL = URLReader.readLine();
-            BufferedReader USERReader = new BufferedReader(new FileReader("user.txt"));
-            USER = USERReader.readLine();
-            BufferedReader PASSWORDReader = new BufferedReader(new FileReader("password.txt"));
-            PASSWORD = PASSWORDReader.readLine();
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("base.txt"));
+            URL = bufferedReader.readLine();
+            USER = bufferedReader.readLine();
+            PASSWORD = bufferedReader.readLine();
         } catch (IOException e) {
             throw new RuntimeException("Файл не найден");
         }
