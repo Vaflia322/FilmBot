@@ -20,7 +20,7 @@ public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
     FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
-    private final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
+    private final static String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
 
     {
         try {
