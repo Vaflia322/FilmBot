@@ -61,7 +61,7 @@ public class FilmsDataBaseQueries {
                 if (!requestValidation.isNameExists(request)) {
                     return new Fault("Вы ввели некорректное название, оно должно быть на РУССКОМ ЯЗЫКЕ");
                 }
-                query = "SELECT * FROM films WHERE name = " + request;
+                query = "SELECT * FROM films WHERE name = " + "\'" + request + "\'";
                 break;
             case GENRE:
                 if (!requestValidation.isGenreExists(request)) {
