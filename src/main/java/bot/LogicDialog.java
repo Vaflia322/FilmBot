@@ -73,7 +73,7 @@ public class LogicDialog {
     }
 
     public void addViewedList(User user, String film) {
-        film = film.replace("добавить просмотренный ","");
+        film = film.replace("добавить просмотренный ", "");
         usersDataBaseQueries.addFilmToViewed(film, user.getUserID());
         dialog.print(user, "\nФильм добавлен в список просмотренных");
     }
@@ -148,7 +148,7 @@ public class LogicDialog {
         user.getApiRequest().remove("characteristicType");
         FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
         ApiObject response = filmsDataBaseQueries.getFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
-        if (response == null){
+        if (response == null) {
             response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
         }
         switch (response) {

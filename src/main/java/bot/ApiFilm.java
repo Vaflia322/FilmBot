@@ -20,7 +20,7 @@ public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
     FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
-    private final static String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
+    private final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
 
     {
         try {
@@ -45,7 +45,7 @@ public class ApiFilm {
             JSONObject object = genres.getJSONObject(i);
             genre.add(object.getString("name"));
         }
-        Film film = new Film(name, description, rating, genre,year);
+        Film film = new Film(name, description, rating, genre, year);
         filmsDataBaseQueries.addFilm(film);
         return film;
     }

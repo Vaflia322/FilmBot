@@ -1,6 +1,10 @@
 package bot;
 
-import java.sql.*;
+import java.sql.Array;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -108,7 +112,6 @@ public class FilmsDataBaseQueries {
                 movies.addFilm(new Film(name, description, String.valueOf(rating), genre, String.valueOf(year)));
             }
         } catch (SQLException e) {
-            // Обработка ошибок SQL
             e.printStackTrace();
         }
         if (movies.getFilms().isEmpty() || movies.getFilms().size() < 10) {
