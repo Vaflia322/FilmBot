@@ -11,7 +11,7 @@ public class LogicDialog {
     private final CommandStorage commandStorage = new CommandStorage();
     private final UsersDataBaseQueries usersDataBaseQueries = new UsersDataBaseQueries();
     private final FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
-    private final Map<UserState, MultiFunction> USER_STATE_STRING_MAP = new HashMap<>();
+    private final static Map<UserState, MultiFunction> USER_STATE_STRING_MAP = new HashMap<>();
 
     {
         USER_STATE_STRING_MAP.put(UserState.SHOW_BLACK_LIST, args -> showList((User) args[0], "blacklist"));
