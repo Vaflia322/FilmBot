@@ -1,5 +1,6 @@
 package bot;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -8,7 +9,23 @@ public class LogicDialog {
     private final ApiFilm apiFilm;
     private final Dialog dialog;
     private final CommandStorage commandStorage = new CommandStorage();
-    UsersDataBaseQueries usersDataBaseQueries = new UsersDataBaseQueries();
+    private final UsersDataBaseQueries usersDataBaseQueries = new UsersDataBaseQueries();
+    private final FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
+    private final Map<UserState, MultiFunction> USER_STATE_STRING_MAP = new HashMap<>();
+
+    {
+        USER_STATE_STRING_MAP.put(UserState.SHOW_BLACK_LIST, args -> showList((User) args[0], "blacklist"));
+        USER_STATE_STRING_MAP.put(UserState.SHOW_WISH_LIST, args -> showList((User) args[0], "wishlist"));
+        USER_STATE_STRING_MAP.put(UserState.SHOW_VIEWED_LIST, args -> showList((User) args[0], "viewed"));
+        USER_STATE_STRING_MAP.put(UserState.ADD_VIEWED_LIST, args -> addViewedList((User) args[0], (String) args[1]));
+        USER_STATE_STRING_MAP.put(UserState.ADD_WISH_LIST, args -> addWishList((User) args[0]));
+        USER_STATE_STRING_MAP.put(UserState.ADD_BLACK_LIST, args -> addBlackList((User) args[0]));
+        USER_STATE_STRING_MAP.put(UserState.CHARACTERISTIC_TYPE, args -> characteristicType((User) args[0],
+                (String) args[1]));
+        USER_STATE_STRING_MAP.put(UserState.GET_GENRE, args -> getGenre((User) args[0]));
+        USER_STATE_STRING_MAP.put(UserState.REQUEST, args -> requestToApi((User) args[0]));
+        USER_STATE_STRING_MAP.put(UserState.GET_FILMS, args -> printFilms((User) args[0], (String) args[1]));
+    }
 
     public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
         this.apiFilm = apiFilm;
@@ -16,42 +33,11 @@ public class LogicDialog {
     }
 
     public void statusProcessing(User user, UserState state, String command) {
-        switch (state) {
-            case SHOW_BLACK_LIST:
-                showList(user, "blacklist");
-                break;
-            case SHOW_WISH_LIST:
-                showList(user, "wishlist");
-                break;
-            case SHOW_VIEWED_LIST:
-                showList(user, "viewed");
-                break;
-            case ADD_VIEWED_LIST:
-                addViewedList(user, command);
-                break;
-            case ADD_WISH_LIST:
-                addWishList(user);
-                break;
-            case ADD_BLACK_LIST:
-                addBlackList(user);
-                break;
-            case CHARACTERISTIC_TYPE:
-                characteristicType(user, command);
-                break;
-            case GET_GENRE:
-                getGenre(user);
-                break;
-            case REQUEST:
-                requestToApi(user);
-                break;
-            case GET_FILMS:
-                printFilms(user, command);
-                break;
-            default:
-                baseCommand(user, command);
-                break;
-
-
+        if (!USER_STATE_STRING_MAP.containsKey(state)) {
+            baseCommand(user, command);
+        } else {
+            MultiFunction function = USER_STATE_STRING_MAP.get(state);
+            function.apply(user, command);
         }
     }
 
@@ -146,7 +132,6 @@ public class LogicDialog {
         String command = user.getApiRequest().get("characteristicType");
         String tellFilmCommand = user.getApiRequest().get("request");
         user.getApiRequest().remove("characteristicType");
-        FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
         ApiObject response = filmsDataBaseQueries.getFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
         if (response == null) {
             response = apiFilm.takeFilms(TypeOfFilmRequest.commandToEnum(command), tellFilmCommand);
@@ -178,6 +163,9 @@ public class LogicDialog {
             }
             if (command.equals("еще")) {
                 Film film = films.remove();
+                if (!filmsDataBaseQueries.checkFilmExists(film.name())) {
+                    filmsDataBaseQueries.addFilm(film);
+                }
                 if (blacklist.contains(film.name())) {
                     while (blacklist.contains(film.name())) {
                         film = films.remove();

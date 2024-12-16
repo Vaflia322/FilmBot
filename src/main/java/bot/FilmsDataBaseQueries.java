@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FilmsDataBaseQueries {
-    DataBaseConnection dataBaseConnection = new DataBaseConnection();
+    private final DataBaseConnection dataBaseConnection = new DataBaseConnection();
 
     public Boolean checkFilmExists(String name) {
         String existsSQL = "SELECT EXISTS(SELECT 1 FROM films WHERE name = ?)";

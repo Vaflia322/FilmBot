@@ -19,8 +19,7 @@ import java.util.List;
 public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
-    FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
-    private final static String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
+    private final String baseUrl = "https://api.kinopoisk.dev/v1.4/movie";
 
     {
         try {
@@ -45,14 +44,12 @@ public class ApiFilm {
             JSONObject object = genres.getJSONObject(i);
             genre.add(object.getString("name"));
         }
-        Film film = new Film(name, description, rating, genre, year);
-        filmsDataBaseQueries.addFilm(film);
-        return film;
+        return new Film(name, description, rating, genre, year);
     }
 
     public ApiObject takeFilms(TypeOfFilmRequest typeOfFilmRequest, String request) {
         final Movies movies = new Movies();
-        final StringBuilder urlRequest = new StringBuilder().append(BASE_URL);
+        final StringBuilder urlRequest = new StringBuilder().append(baseUrl);
         switch (typeOfFilmRequest) {
             case NAME:
                 if (!requestValidation.isNameExists(request)) {

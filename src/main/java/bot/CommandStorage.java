@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class CommandStorage {
@@ -32,60 +34,52 @@ public class CommandStorage {
         return genres;
     }
 
-    private final Set<String> supportedCommand = new HashSet<>(Set.of("/help", "подскажи фильм", "стоп"));
-    private final Set<String> supportedFilmsCommand = new HashSet<>(Set.of("название", "жанр", "год", "рейтинг",
-            "случайный"));
+    private final Map<String, String> supportedCommand = new HashMap<>(Map.of(
+            "/help", "Для получения справки введите /help, если вам нужно подсказать фильм введите подскажи фильм\n"
+                    + "Для того чтобы вывести список фильмов которые вы добавили в черный список введите"
+                    + " черный список\n"
+                    + "Для того чтобы вывести список просмотренных фильмов введите просмотренные\n"
+                    + "Для того чтобы вывести список фильмов желаемых к просмотру введите желаемые к просмотру\n"
+                    + "Для того чтобы добавить просмотренный филь введите добавить просмотренный"
+                    + " \"название фильма\"\n"
+                    + "Чтобы прекратить работу бота введите стоп",
+            "подскажи фильм", "Я могу подсказать фильм по названию, жанру, рейтингу, году или же выдать случайный фильм\n"
+                    + "Для того чтобы я мог это сделать введите слова название, жанр, рейтинг, "
+                    + "год или же случайный",
+            "стоп", "Обращайтесь еще!"
+    ));
+    private final Map<String, String> supportedFilmsCommand = new HashMap<>(Map.of(
+            "название", "Введите название фильма на русском языке",
+            "жанр", "Введите жанр фильма, либо введите список для получения всех жанров",
+            "год", "Введите год, либо диапазон, напрмер 2018,2020-2023",
+            "рейтинг", "Введите рейтинг, либо диапазон рейтинга, например 7, 7.2-8.3",
+            "случайный", "Ваш случайный фильм"
+    ));
+
 
     public boolean isCommand(String command) {
         return isSupportedCommand(command) || isSupportedFilmsCommand(command);
     }
 
     public boolean isSupportedCommand(String command) {
-        return supportedCommand.contains(command);
+        return supportedCommand.containsKey(command);
     }
 
     public boolean isSupportedFilmsCommand(String command) {
-        return supportedFilmsCommand.contains(command);
+        return supportedFilmsCommand.containsKey(command);
     }
 
     public String parsingSupportedCommand(String command) {
-        switch (command) {
-            case ("/help"):
-                return "Для получения справки введите /help, если вам нужно подсказать фильм введите подскажи фильм\n"
-                        + "Для того чтобы вывести список фильмов которые вы добавили в черный список введите"
-                        + " черный список\n"
-                        + "Для того чтобы вывести список просмотренных фильмов введите просмотренные\n"
-                        + "Для того чтобы вывести список фильмов желаемых к просмотру введите желаемые к просмотру\n"
-                        + "Для того чтобы добавить просмотренный филь введите добавить просмотренный"
-                        + " \"название фильма\"\n"
-                        + "Чтобы прекратить работу бота введите стоп";
-            case ("подскажи фильм"):
-                return "Я могу подсказать фильм по названию, жанру, рейтингу, году или же выдать случайный фильм\n"
-                        + "Для того чтобы я мог это сделать введите слова название, жанр, рейтинг, "
-                        + "год или же случайный";
-            case ("стоп"):
-                return "Обращайтесь еще!";
-            default:
-                return "Для получения справки введите /help";
+        if (isSupportedCommand(command)) {
+            return supportedCommand.get(command);
         }
+        return "Для получения справки введите /help";
     }
 
     public String parsingSupportedFilmsCommand(String command) {
-        switch (command) {
-            case ("название"):
-                return "Введите название фильма на русском языке";
-            case ("жанр"):
-                return "Введите жанр фильма, либо введите список для получения всех жанров";
-            case ("рейтинг"):
-                return "Введите рейтинг, либо диапазон рейтинга, например 7, 7.2-8.3";
-            case ("год"):
-                return "Введите год, либо диапазон, напрмер 2018,2020-2023";
-            case ("случайный"):
-                return "Ваш случайный фильм";
-            default:
-                return "Вы ввели некорректную характеристику";
-
+        if (isSupportedFilmsCommand(command)) {
+            return supportedFilmsCommand.get(command);
         }
-
+        return "Вы ввели некорректную характеристику";
     }
 }

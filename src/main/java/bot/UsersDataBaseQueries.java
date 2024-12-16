@@ -12,10 +12,9 @@ import java.util.Set;
 import java.util.List;
 
 public class UsersDataBaseQueries {
-    DataBaseConnection dataBaseConnection = new DataBaseConnection();
+    private final DataBaseConnection dataBaseConnection = new DataBaseConnection();
 
     public void createUser(long userID) {
-        DataBaseConnection dataBaseConnection = new DataBaseConnection();
         String insertSQL = "INSERT INTO users (userid, blacklist, viewed, wishlist) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = dataBaseConnection.connect();
