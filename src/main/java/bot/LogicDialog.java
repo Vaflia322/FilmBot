@@ -11,20 +11,20 @@ public class LogicDialog {
     private final CommandStorage commandStorage = new CommandStorage();
     private final UsersDataBaseQueries usersDataBaseQueries = new UsersDataBaseQueries();
     private final FilmsDataBaseQueries filmsDataBaseQueries = new FilmsDataBaseQueries();
-    private final static Map<UserState, MultiFunction> USER_STATE_STRING_MAP = new HashMap<>();
+    private final Map<UserState, MultiFunction> userStateMultiFunctionMap = new HashMap<>();
 
     {
-        USER_STATE_STRING_MAP.put(UserState.SHOW_BLACK_LIST, args -> showList((User) args[0], "blacklist"));
-        USER_STATE_STRING_MAP.put(UserState.SHOW_WISH_LIST, args -> showList((User) args[0], "wishlist"));
-        USER_STATE_STRING_MAP.put(UserState.SHOW_VIEWED_LIST, args -> showList((User) args[0], "viewed"));
-        USER_STATE_STRING_MAP.put(UserState.ADD_VIEWED_LIST, args -> addViewedList((User) args[0], (String) args[1]));
-        USER_STATE_STRING_MAP.put(UserState.ADD_WISH_LIST, args -> addWishList((User) args[0]));
-        USER_STATE_STRING_MAP.put(UserState.ADD_BLACK_LIST, args -> addBlackList((User) args[0]));
-        USER_STATE_STRING_MAP.put(UserState.CHARACTERISTIC_TYPE, args -> characteristicType((User) args[0],
+        userStateMultiFunctionMap.put(UserState.SHOW_BLACK_LIST, args -> showList((User) args[0], "blacklist"));
+        userStateMultiFunctionMap.put(UserState.SHOW_WISH_LIST, args -> showList((User) args[0], "wishlist"));
+        userStateMultiFunctionMap.put(UserState.SHOW_VIEWED_LIST, args -> showList((User) args[0], "viewed"));
+        userStateMultiFunctionMap.put(UserState.ADD_VIEWED_LIST, args -> addViewedList((User) args[0], (String) args[1]));
+        userStateMultiFunctionMap.put(UserState.ADD_WISH_LIST, args -> addWishList((User) args[0]));
+        userStateMultiFunctionMap.put(UserState.ADD_BLACK_LIST, args -> addBlackList((User) args[0]));
+        userStateMultiFunctionMap.put(UserState.CHARACTERISTIC_TYPE, args -> characteristicType((User) args[0],
                 (String) args[1]));
-        USER_STATE_STRING_MAP.put(UserState.GET_GENRE, args -> getGenre((User) args[0]));
-        USER_STATE_STRING_MAP.put(UserState.REQUEST, args -> requestToApi((User) args[0]));
-        USER_STATE_STRING_MAP.put(UserState.GET_FILMS, args -> printFilms((User) args[0], (String) args[1]));
+        userStateMultiFunctionMap.put(UserState.GET_GENRE, args -> getGenre((User) args[0]));
+        userStateMultiFunctionMap.put(UserState.REQUEST, args -> requestToApi((User) args[0]));
+        userStateMultiFunctionMap.put(UserState.GET_FILMS, args -> printFilms((User) args[0], (String) args[1]));
     }
 
     public LogicDialog(ApiFilm apiFilm, Dialog dialog) {
@@ -33,10 +33,10 @@ public class LogicDialog {
     }
 
     public void statusProcessing(User user, UserState state, String command) {
-        if (!USER_STATE_STRING_MAP.containsKey(state)) {
+        if (!userStateMultiFunctionMap.containsKey(state)) {
             baseCommand(user, command);
         } else {
-            MultiFunction function = USER_STATE_STRING_MAP.get(state);
+            MultiFunction function = userStateMultiFunctionMap.get(state);
             function.apply(user, command);
         }
     }
@@ -141,11 +141,14 @@ public class LogicDialog {
                 dialog.print(user, fault.getError());
             }
             case Movies movies -> {
-                Queue<Film> films = movies.getFilms();
-                user.setFilms(films);
-                if (films.isEmpty()) {
+                Queue<Film> films = movies.getFilms();И
                     dialog.print(user, "Не нашлось фильмов с такими характеристиками");
                 } else {
+                    for (Film film : films){
+                        if (!filmsDataBaseQueries.checkFilmExists(film.name())) {
+                            filmsDataBaseQueries.addFilm(film);
+                        }
+                    }
                     printFilms(user, "еще");
                 }
             }
@@ -163,9 +166,6 @@ public class LogicDialog {
             }
             if (command.equals("еще")) {
                 Film film = films.remove();
-                if (!filmsDataBaseQueries.checkFilmExists(film.name())) {
-                    filmsDataBaseQueries.addFilm(film);
-                }
                 if (blacklist.contains(film.name())) {
                     while (blacklist.contains(film.name())) {
                         film = films.remove();
