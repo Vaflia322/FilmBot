@@ -141,7 +141,9 @@ public class LogicDialog {
                 dialog.print(user, fault.getError());
             }
             case Movies movies -> {
-                Queue<Film> films = movies.getFilms();И
+                Queue<Film> films = movies.getFilms();
+                user.setFilms(films);
+                if (films.isEmpty()) {
                     dialog.print(user, "Не нашлось фильмов с такими характеристиками");
                 } else {
                     for (Film film : films){
