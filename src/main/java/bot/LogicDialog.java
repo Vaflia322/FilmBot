@@ -17,7 +17,8 @@ public class LogicDialog {
         userStateMultiFunctionMap.put(UserState.SHOW_BLACK_LIST, args -> showList((User) args[0], "blacklist"));
         userStateMultiFunctionMap.put(UserState.SHOW_WISH_LIST, args -> showList((User) args[0], "wishlist"));
         userStateMultiFunctionMap.put(UserState.SHOW_VIEWED_LIST, args -> showList((User) args[0], "viewed"));
-        userStateMultiFunctionMap.put(UserState.ADD_VIEWED_LIST, args -> addViewedList((User) args[0], (String) args[1]));
+        userStateMultiFunctionMap.put(UserState.ADD_VIEWED_LIST, args -> addViewedList((User) args[0],
+                (String) args[1]));
         userStateMultiFunctionMap.put(UserState.ADD_WISH_LIST, args -> addWishList((User) args[0]));
         userStateMultiFunctionMap.put(UserState.ADD_BLACK_LIST, args -> addBlackList((User) args[0]));
         userStateMultiFunctionMap.put(UserState.CHARACTERISTIC_TYPE, args -> characteristicType((User) args[0],
@@ -145,7 +146,7 @@ public class LogicDialog {
                 user.setFilms(films);
                 if (films.isEmpty()) {
                     dialog.print(user, "Не нашлось фильмов с такими характеристиками");
-                } else {
+                } else{
                     for (Film film : films){
                         if (!filmsDataBaseQueries.checkFilmExists(film.name())) {
                             filmsDataBaseQueries.addFilm(film);
