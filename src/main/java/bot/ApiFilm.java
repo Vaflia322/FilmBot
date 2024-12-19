@@ -19,7 +19,7 @@ import java.util.List;
 public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
-    private final String baseUrl = "https://api.kinopoisk.dev/v1.4/movie";
+    private final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
 
     {
         try {
@@ -49,7 +49,7 @@ public class ApiFilm {
 
     public ApiObject takeFilms(TypeOfFilmRequest typeOfFilmRequest, String request) {
         final Movies movies = new Movies();
-        final StringBuilder urlRequest = new StringBuilder().append(baseUrl);
+        final StringBuilder urlRequest = new StringBuilder().append(BASE_URL);
         switch (typeOfFilmRequest) {
             case NAME:
                 if (!requestValidation.isNameExists(request)) {
