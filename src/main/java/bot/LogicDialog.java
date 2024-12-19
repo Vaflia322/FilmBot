@@ -146,8 +146,8 @@ public class LogicDialog {
                 user.setFilms(films);
                 if (films.isEmpty()) {
                     dialog.print(user, "Не нашлось фильмов с такими характеристиками");
-                } else{
-                    for (Film film : films){
+                } else {
+                    for (Film film : films) {
                         if (!filmsDataBaseQueries.checkFilmExists(film.name())) {
                             filmsDataBaseQueries.addFilm(film);
                         }
