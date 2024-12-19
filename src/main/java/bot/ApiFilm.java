@@ -19,7 +19,7 @@ import java.util.List;
 public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
-    private final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
+    private static final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
 
     {
         try {
