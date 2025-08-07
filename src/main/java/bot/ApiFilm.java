@@ -19,7 +19,7 @@ import java.util.List;
 public class ApiFilm {
     private final BufferedReader fileReader;
     private final String apiKey;
-    private final static String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
+    private static final String BASE_URL = "https://api.kinopoisk.dev/v1.4/movie";
 
     {
         try {
@@ -37,13 +37,14 @@ public class ApiFilm {
         String description = docs.getString("description");
         JSONObject ratings = (docs.getJSONObject("rating"));
         String rating = ratings.get("kp").toString();
+        String year = String.valueOf(docs.getInt("year"));
         JSONArray genres = docs.getJSONArray("genres");
         List<String> genre = new ArrayList<>();
         for (int i = 0; i < genres.length(); i++) {
             JSONObject object = genres.getJSONObject(i);
             genre.add(object.getString("name"));
         }
-        return new Film(name, description, rating, genre);
+        return new Film(name, description, rating, genre, year);
     }
 
     public ApiObject takeFilms(TypeOfFilmRequest typeOfFilmRequest, String request) {

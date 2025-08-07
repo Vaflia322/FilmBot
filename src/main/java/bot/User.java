@@ -8,6 +8,7 @@ public class User {
     private final long userID;
     private final Map<String, String> apiRequest;
     private Queue<Film> films;
+    private Film lastFilm;
 
     public User(long userID) {
         this.userID = userID;
@@ -36,5 +37,13 @@ public class User {
 
     public void setFilms(Queue<Film> films) {
         this.films = films;
+    }
+
+    public Film getLastFilm() {
+        return lastFilm;
+    }
+
+    public void setLastFilm(Film lastFilm) {
+        this.lastFilm = lastFilm;
     }
 }
